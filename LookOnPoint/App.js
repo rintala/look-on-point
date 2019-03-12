@@ -6,6 +6,7 @@ import AppNavigator from './navigation/AppNavigator';
 export default class App extends React.Component {
   state = {
     isLoadingComplete: false,
+  
   };
 
   render() {
@@ -39,6 +40,9 @@ export default class App extends React.Component {
         // We include SpaceMono because we use it in HomeScreen.js. Feel free
         // to remove this if you are not using it in your app
         'space-mono': require('./assets/fonts/SpaceMono-Regular.ttf'),
+        'Amaranth': require('./assets/fonts/Amaranth/Amaranth-Italic.ttf'),
+        'Romanesco': require('./assets/fonts/Romanesco-Regular.ttf'),
+        'PT_Sans': require('./assets/fonts/PT_Sans/PT_Sans-Web-Regular.ttf'),
       }),
     ]);
   };
