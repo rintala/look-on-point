@@ -35,71 +35,43 @@ export default class HomeScreen extends React.Component {
       <View style={styles.container}>
         
         <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-        <ImageBackground
-                style={styles.iconGirlBg} source={require('../assets/images/icon-girl-medium.png')}
-              >  
-          <View style={styles.welcomeContainer}>
-            {/*<Image
-              source={
-                __DEV__
-                  ? require('../assets/images/robot-dev.png')
-                  : require('../assets/images/robot-prod.png')
-              }
-              style={styles.welcomeImage}
-            />*/}
-          </View>
-             
-            <View style={styles.getStartedContainer}>
-              {/*this._maybeRenderDevelopmentModeWarning()*/}
-              
-
-
-              <Text style={{color: '#ffe6ff', fontSize: 59, fontFamily:'Romanesco'}}>
-                LookOnPoint
-              </Text>
-
-              
-              <Text style={styles.appNameSubText}>
-                Your style guide from the future
-              </Text>
-
-              <View style={{marginTop: 16, marginBottom: 16, width: 100}}>
-                <Button buttonStyle={styles.loginButton} title=" LOGIN " onPress={this.onPressLogin} color="#400080"/>
-              </View>
-              <View style={{marginTop: 16, width: 100}}>
-                <Button buttonStyle={styles.signupButton} title="SIGNUP" onPress={this.onPressSignup} color="#6600cc"/>
-              </View>
+          <ImageBackground
+                  style={styles.iconGirlBg} source={require('../assets/images/icon-girl-medium.png')}
+                >  
+            <View style={styles.welcomeContainer}>
+              {/*<Image
+                source={
+                  __DEV__
+                    ? require('../assets/images/robot-dev.png')
+                    : require('../assets/images/robot-prod.png')
+                }
+                style={styles.welcomeImage}
+              />*/}
             </View>
-        </ImageBackground>
-        </ScrollView>
-        
+               
+              <View style={styles.getStartedContainer}>
+                {/*this._maybeRenderDevelopmentModeWarning()*/}
+              
+                <Text style={{color: '#ffe6ff', fontSize: 59, fontFamily:'Romanesco'}}>
+                  LookOnPoint
+                </Text>
 
-        
+                <Text style={styles.appNameSubText}>
+                  Your personal style guide
+                </Text>
+
+                <View style={{marginTop: 16, marginBottom: 16, width: 100}}>
+                  <Button buttonStyle={styles.loginButton} title=" LOGIN " onPress={this.onPressLogin} color="#400080"/>
+                </View>
+                <View style={{marginTop: 16, width: 100}}>
+                  <Button buttonStyle={styles.signupButton} title="SIGNUP" onPress={this.onPressSignup} color="#6600cc"/>
+                </View>
+              </View>
+          </ImageBackground>
+        </ScrollView>
+   
       </View>
     );
-  }
-
-  _maybeRenderDevelopmentModeWarning() {
-    if (__DEV__) {
-      const learnMoreButton = (
-        <Text onPress={this._handleLearnMorePress} style={styles.helpLinkText}>
-          Learn more
-        </Text>
-      );
-
-      return (
-        <Text style={styles.developmentModeText}>
-          Development mode is enabled, your app will be slower but you can use useful development
-          tools. {learnMoreButton}
-        </Text>
-      );
-    } else {
-      return (
-        <Text style={styles.developmentModeText}>
-          You are not in development mode, your app will run at full speed.
-        </Text>
-      );
-    }
   }
 
   _handleLearnMorePress = () => {
