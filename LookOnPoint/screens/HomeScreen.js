@@ -15,6 +15,7 @@ import { WebBrowser } from 'expo';
 import { Font } from 'expo';
 import { MonoText, AmaranthText} from '../components/StyledText';
 
+
 export default class HomeScreen extends React.Component {
   static navigationOptions = {
     header: null,
@@ -52,7 +53,7 @@ export default class HomeScreen extends React.Component {
               <View style={styles.getStartedContainer}>
                 {/*this._maybeRenderDevelopmentModeWarning()*/}
               
-                <Text style={{color: '#ffe6ff', fontSize: 59, fontFamily:'Romanesco'}}>
+                <Text style={{color: '#ffe6ff', fontSize: 67, fontFamily:'Romanesco'}}>
                   LookOnPoint
                 </Text>
 
