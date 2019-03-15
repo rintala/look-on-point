@@ -5,10 +5,12 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
   Button,
-  ImageBackground
+  ImageBackground,
+  AsyncStorage,
 } from 'react-native';
 import { WebBrowser } from 'expo';
 
@@ -17,14 +19,64 @@ import { MonoText, AmaranthText} from '../components/StyledText';
 
 
 export default class HomeScreen extends React.Component {
-  static navigationOptions = {
-    header: null,
-  };
-
-  onPressLogin(){
-    alert('Logging you in');
+  
+  constructor(props){
+    super(props);
+    this.state = {
+      username: "",
+      password: "",
+    }
   }
 
+  componentDidMount(){
+    this._loadInitialState().done();
+  }
+
+  _loadInitialState = async () => { 
+    var value = await AsyncStorage.getItem('user');
+    if(value !== null){
+      this.props.navigation.navigate('Profile');
+    }
+  }
+
+  static navigationOptions = {
+    header: null,
+  }
+
+  onPressLogin = () => {
+    alert('Logging you in');
+
+    fetch('http://127.0.0.1:8000/users/post/', {
+      method: 'POST',
+      credentials: "same-origin",
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        username: this.state.username,
+        password: this.state.password,
+      })
+    })
+
+    .then((response) => response.json())
+    .then((res) => {
+      console.log("reS",res);
+      //alert("RES: ",res.toString());
+      if(res.username !== ""){
+        console.log("SUCCESS");
+        alert("success");
+        AsyncStorage.setItem('user', JSON.stringify(res));
+        this.props.navigation.navigate('Links');
+      }
+      else{
+        console.log("UNSUCCESFUL");
+        alert("RR",res.message);
+      }
+    })
+    .done();
+  }
+  
   onPressSignup(){
     alert('Signing you up');
   }
@@ -60,7 +112,8 @@ export default class HomeScreen extends React.Component {
                 <Text style={styles.appNameSubText}>
                   Your personal style guide
                 </Text>
-
+                <TextInput placeholder='Username' onChangeText={ (username) => this.setState({username})}/>
+                <TextInput placeholder='Password' onChangeText={ (password) => this.setState({password})}/>
                 <View style={{marginTop: 16, marginBottom: 16, width: 100}}>
                   <Button buttonStyle={styles.loginButton} title=" LOGIN " onPress={this.onPressLogin} color="#400080"/>
                 </View>
@@ -77,13 +130,13 @@ export default class HomeScreen extends React.Component {
 
   _handleLearnMorePress = () => {
     WebBrowser.openBrowserAsync('https://docs.expo.io/versions/latest/guides/development-mode');
-  };
+  }
 
   _handleHelpPress = () => {
     WebBrowser.openBrowserAsync(
       'https://docs.expo.io/versions/latest/guides/up-and-running.html#can-t-see-your-changes'
     );
-  };
+  }
 }
 
 const styles = StyleSheet.create({
