@@ -7,6 +7,9 @@ import HomeScreen from '../screens/HomeScreen';
 import LinksScreen from '../screens/LinksScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 
+// import mainfeed screen from screens
+import MainFeedScreen from '../screens/MainFeedScreen';
+
 const HomeStack = createStackNavigator({
   Home: HomeScreen,
 });
@@ -55,8 +58,24 @@ SettingsStack.navigationOptions = {
   ),
 };
 
+// Main feed
+const MainFeedStack = createStackNavigator({
+  MainFeed: MainFeedScreen,
+});
+
+LinksStack.navigationOptions = {
+  tabBarLabel: 'MainFeed',
+  tabBarIcon: ({ focused }) => (
+    <TabBarIcon
+      focused={focused}
+      name={Platform.OS === 'ios' ? 'ios-link' : 'md-link'}
+    />
+  ),
+};
+
 export default createBottomTabNavigator({
   HomeStack,
   LinksStack,
   SettingsStack,
+  MainFeedStack,
 });

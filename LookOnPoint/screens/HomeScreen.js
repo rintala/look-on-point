@@ -53,6 +53,7 @@ export default class HomeScreen extends React.Component {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
+
       body: JSON.stringify({
         username: this.state.username,
         password: this.state.password,
@@ -67,7 +68,7 @@ export default class HomeScreen extends React.Component {
         console.log("SUCCESS");
         alert("success");
         AsyncStorage.setItem('user', JSON.stringify(res));
-        this.props.navigation.navigate('Links');
+        this.props.navigation.navigate('MainFeed');
       }
       else{
         console.log("UNSUCCESFUL");
