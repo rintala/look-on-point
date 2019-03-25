@@ -8,3 +8,9 @@ Tänk på att hålla en någolunda snygg och tydlig githistorik där det syns at
 ## Gitignore
 Det är bra att i början av ett projekt skapa en bra `.gitignore` så att ni inte råkar pusha upp byggfiler, paket eller annat som inte hör hemma i ett gitrepo.
 En bra sida för att generera en gitignore är [gitignore.io](https://gitignore.io/). Där kan ni skriva in de språk/editors/operativsystem ni använder och därmed få en rimlig gitignore.
+
+
+
+## Dev. comments
+
+- **25 March:** Decided to use SQLite for DB. Primarily since already setup by default with Django backend which will save time. Also found solid plugin for React Native "react-native-sqlite-2".
