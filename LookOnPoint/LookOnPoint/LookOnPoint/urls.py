@@ -24,6 +24,8 @@ router = routers.DefaultRouter()
 # Register views on the router
 router.register(r'users', views.UserViewSet)
 router.register(r'groups', views.GroupViewSet)
+router.register(r'comments', views.CommentViewSet)
+router.register(r'posts', views.PostViewSet)
 
 # Add the urls registered on the router to our URL:s
 urlpatterns = [

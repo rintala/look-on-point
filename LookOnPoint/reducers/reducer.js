@@ -15,6 +15,7 @@ const reducer = (state = initialState, action) => {
         ...state,
         counter: state.counter + 1
       }
+      
     default:
       return state;
   }

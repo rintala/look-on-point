@@ -1,7 +1,8 @@
 from django.shortcuts import render
 from django.contrib.auth.models import User, Group
+from .models import Post, Comment
 from rest_framework import viewsets
-from quickstart.serializers import UserSerializer, GroupSerializer
+from quickstart.serializers import UserSerializer, GroupSerializer, PostSerializer, CommentSerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import action
@@ -36,10 +37,64 @@ class UserViewSet(viewsets.ModelViewSet):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
-
 class GroupViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows groups to be viewed or edited.
     """
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
+
+
+# Create your views here.
+class PostViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = Post.objects.all().order_by('-createdOn')
+    serializer_class = PostSerializer
+
+    @action(detail=True, methods=['post'])
+    def post(self, request, pk=None):
+        print("POSTED")
+        
+        serializer_context = {
+            'request': request,
+        }
+
+        serializer = PostSerializer(data=request.data, context=serializer_context)
+        print("P",serializer.is_valid())
+        if serializer.is_valid() == True:
+            print("sucessful backend")
+            instance = serializer.save()
+            messages.success(request._request, 'Success')
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+
+
+class CommentViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = Comment.objects.all().order_by('-createdOn')
+    serializer_class = CommentSerializer
+
+    @action(detail=True, methods=['post'])
+    def post(self, request, pk=None):
+        print("POSTED")
+        
+        serializer_context = {
+            'request': request,
+        }
+
+        serializer = CommentSerializer(data=request.data, context=serializer_context)
+        print("P",serializer.is_valid())
+        if serializer.is_valid() == True:
+            print("sucessful backend")
+            instance = serializer.save()
+            messages.success(request._request, 'Success')
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        

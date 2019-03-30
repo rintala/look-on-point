@@ -43,9 +43,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
     
     #Register our rest_framework
     'rest_framework',
+
+    #Register app for models to work
+    'quickstart.apps.QuickstartConfig'
 ]
 
 MIDDLEWARE = [

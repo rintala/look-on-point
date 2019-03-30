@@ -4,9 +4,6 @@ import {Provider} from 'react-redux'
 
 import App from './App'
 
-import configureStore from './store/store.js'
-const store = configureStore()
-
 class LookOnPointApp extends Component {
   render() {
     return(

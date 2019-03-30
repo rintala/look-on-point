@@ -17,6 +17,7 @@ import { WebBrowser } from 'expo';
 import { Font } from 'expo';
 import { MonoText, AmaranthText} from '../components/StyledText';
 
+import SQLite from 'react-native-sqlite-2';
 
 export default class HomeScreen extends React.Component {
   
