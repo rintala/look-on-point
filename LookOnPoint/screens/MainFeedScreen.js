@@ -28,13 +28,13 @@ class CommentContent extends Component {
         <View>
           <Text>{this.props.searchedForPostID}</Text>
           {this.props.comments.map(commentInfo => {
-             return commentInfo.id == this.props.searchedForPostID ?
+             return commentInfo.postID == this.props.searchedForPostID ?
                 //use approach 3 - proposed by 
                 //source: https://medium.com/@szholdiyarov/conditional-rendering-in-react-native-286351816db4
                 //provide func with params of id
 
                 <Text key={commentInfo.id} style={{textAlign: 'center', fontSize: 27, fontFamily:'Romanesco'}}>
-                   {commentInfo.user.username}: "{commentInfo.content}"
+                   {commentInfo.userName}: "{commentInfo.content}"
                 </Text>
                 :
                 <Text key={commentInfo.id}>.....</Text>}
@@ -50,8 +50,12 @@ export default class MainFeedScreen extends React.Component {
   };
 
 
-  constructor() {
-     super();
+  constructor(props) {
+     super(props);
+     // get current user from home screen
+     const activeUserID = props.navigation.getParam('activeUserID', 'NO-ID');
+     const activeUsername = props.navigation.getParam('activeUsername', 'NO-USERNAME');
+     
      this.state = {
         postID: 1,
         posts: [
@@ -67,28 +71,25 @@ export default class MainFeedScreen extends React.Component {
             showComments: false,
           }
         ],
+
+        // store username directly here for displaying - instead of userID - good idea?
+        // conclusion: yes, since we can still look up more userID through backend, using postID
+        // tradeoff - but worth it as of now
+
         comments: [
             {
               id: 0,
               postID: 0,
               content: 'Looking so dope.',
-              user: {
-                'url': "..", 
-                'username': "fashionGURU", 
-                'email': "..", 
-                'groups': "..",
-              },
+              userName: 'mrCool',
+              userID: 11,
             },
             {
               id: 1,
               postID: 1,
               content: 'Fire style.',
-              user: {
-                'url': "..", 
-                'username': "fashionable101", 
-                'email': "..", 
-                'groups': "..",
-              },
+              userName: 'fashionGuru',
+              userID: 12,
             }
         ],
         showCommentInput: false,
@@ -97,23 +98,16 @@ export default class MainFeedScreen extends React.Component {
           id: 0,
           postID: 0,
           content: 'Looking so dope.',
-          user: {
-            'url': "..", 
-            'username': "..", 
-            'email': "..", 
-            'groups': "..",
-          },
         },
 
-        currentUser: {
-          'url': "..", 
-          'username': "..", 
-          'email': "..", 
-          'groups': "..",
-        },
+        'currentUserID': activeUserID,
+        'currentUserUsername': activeUsername, 
+        'currentUserEmail': "..", 
+        'currentUserGroups': "..",
       };
-
    };
+
+
 
   displayAddNewComment(){
     //alert("Adding new comment - show new component...");
@@ -132,14 +126,16 @@ export default class MainFeedScreen extends React.Component {
         id: 0,
         postID: postID,
         content: event.nativeEvent.text,
-        user: this.state.currentUser,
+        userName: this.state.currentUserUsername,
+        userID: this.state.currentUserID,
+
       }
     });
     console.log("STATE: ", this.state)
   };
 
   submitNewComment(){
-    alert("Adding new comment - show new component...");
+    //alert("Adding new comment - show new component...");
 
     let newCommentsArray = this.state.comments;
     newCommentsArray.push(this.state.commentToSubmit);
@@ -193,14 +189,22 @@ export default class MainFeedScreen extends React.Component {
            <Text style={{textAlign: 'center', color: 'white', fontSize: 37, fontFamily:'Romanesco'}}>
                 LookOnPoint
            </Text>
+           
          </View>
+         <Button style={{textAlign: 'center', color: 'white', fontSize: 37, fontFamily:'Romanesco'}} title="My Profile" onPress={() => 
+            this.props.navigation.navigate('Settings',{
+              userName: this.state.currentUserUsername,
+              userID: this.state.currentUserID,
+              otherParam: 'anything you want here',
+            })
+           }/> 
          
 
       <ScrollView style={styles.container}>
          {this.state.posts.map(postInfo => {
              return (
 
-              // styling feed posts differently depending on even/odd id
+               // styling feed posts differently depending on even/odd id
                <View style={[(postInfo.id % 2 == 1) ? styles.oddPost : styles.evenPost]} key={postInfo.id}>
                   <Text style={{textAlign: 'center', fontSize: 47, fontFamily:'Romanesco'}}>
                     Look {postInfo.id}

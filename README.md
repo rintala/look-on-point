@@ -1,7 +1,7 @@
 # LookOnPoint
 A React Native project in the KTH course intnet19.
 
-
+Readme template: https://gist.github.com/PurpleBooth/109311bb0361f32d87a2
 
 ## Getting started
 

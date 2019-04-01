@@ -49,7 +49,7 @@ const SettingsStack = createStackNavigator({
 });
 
 SettingsStack.navigationOptions = {
-  tabBarLabel: 'Settings',
+  tabBarLabel: 'My Profile',
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
       focused={focused}
@@ -64,7 +64,7 @@ const MainFeedStack = createStackNavigator({
 });
 
 LinksStack.navigationOptions = {
-  tabBarLabel: 'MainFeed',
+  tabBarLabel: 'Add Post',
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
       focused={focused}
@@ -76,6 +76,6 @@ LinksStack.navigationOptions = {
 export default createBottomTabNavigator({
   HomeStack,
   LinksStack,
-  SettingsStack,
   MainFeedStack,
+  SettingsStack,
 });

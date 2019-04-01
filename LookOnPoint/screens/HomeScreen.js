@@ -44,6 +44,7 @@ export default class HomeScreen extends React.Component {
     header: null,
   }
 
+  // TODO: fix login function - only check - do not add user if not exists - make backend produce correct resp
   onPressLogin = () => {
     alert('Logging you in');
 
@@ -69,7 +70,18 @@ export default class HomeScreen extends React.Component {
         console.log("SUCCESS");
         alert("success");
         AsyncStorage.setItem('user', JSON.stringify(res));
-        this.props.navigation.navigate('MainFeed');
+      
+        var theUrl = res.url.split( '/' );
+        console.log("theurl:", theUrl);
+        var theUserID = theUrl[theUrl.length-2];
+
+        console.log("USERID:", theUserID);
+
+        this.props.navigation.navigate('MainFeed',{
+              activeUserID: theUserID,
+              activeUsername: res.username,
+              otherParam: 'anything you want here',
+            });
       }
       else{
         console.log("UNSUCCESFUL");
