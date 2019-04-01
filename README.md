@@ -1,17 +1,36 @@
-# Projekt
-Ni ska lämna in er kod till projektet här. Det är okej att även ha projektet publikt på github om ni vill, men då behöver ni även pusha projektet hit. Behöver ni hjälp med git är ni välkomna att fråga assistenterna.
-
-Innan ni börjar på projektet behöver ni få er projektspecifikation godkänd. Ni lämnar in den på canvas här: https://kth.instructure.com/courses/7493/assignments/82729 Om ni är flera som jobbar tillsammans så behöver bara en lämna in uppgiften
-
-Tänk på att hålla en någolunda snygg och tydlig githistorik där det syns att alla jobbat på projektet. Försök att hålla commits så små som möjligt (atomic). 
-
-## Gitignore
-Det är bra att i början av ett projekt skapa en bra `.gitignore` så att ni inte råkar pusha upp byggfiler, paket eller annat som inte hör hemma i ett gitrepo.
-En bra sida för att generera en gitignore är [gitignore.io](https://gitignore.io/). Där kan ni skriva in de språk/editors/operativsystem ni använder och därmed få en rimlig gitignore.
+# LookOnPoint
+A React Native project in the KTH course intnet19.
 
 
 
-## Dev. comments
+## Getting started
+
+### Deployment
+
+Run server:
+
+```
+source LookOnPoint/env/bin/activate
+python LookOnPoint/LookOnPoint/manage.py runserver
+```
+
+Run application:
+
+```
+npm start
+```
+
+- Then follow Expo instructions for displaying app on either Android/iOS emulator or smartphone.
+
+### Authors
+
+- **Jonathan Rintala**
+
+### License
+
+This project is licensed under the MIT License - see the [LICENSE.md](https://gist.github.com/PurpleBooth/LICENSE.md) file for details.
+
+### Dev comments
 
 - **25 March:** Decided to use SQLite for DB. Primarily since already setup by default with Django backend which will save time. Also found solid plugin for React Native "react-native-sqlite-2".
   - Source: https://pusher.com/tutorials/persisting-data-react-native
