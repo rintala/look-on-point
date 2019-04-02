@@ -1,5 +1,11 @@
 import React from 'react';
-import { ScrollView, StyleSheet, Text, View, Image, Button, Dimensions } from 'react-native';
+import { ScrollView, 
+  StyleSheet, 
+  Text, 
+  View, 
+  Image, 
+  Button, 
+  Dimensions } from 'react-native';
 import { ExpoLinksView } from '@expo/samples';
 import { ImagePicker } from 'expo';
 
@@ -16,7 +22,7 @@ export default class LinksScreen extends React.Component {
   state = {
     image: null,
   }
-  
+
   onPressLogin = () => {
     alert('Logging you in');
 

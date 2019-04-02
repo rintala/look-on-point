@@ -12,6 +12,7 @@ import {
   Alert,
   TouchableHighlight,
   TouchableOpacity,
+  AsyncStorage
 
  } from 'react-native';
 
@@ -29,9 +30,59 @@ export default class SettingsScreen extends React.Component {
     this.state = {
       userName: '',
       userID: '',
+      userEmail: '',
+      //TODO: remove after dev testing done
+      userPass: '',
     }
   };
   
+   componentDidMount(){
+    this._loadInitialState().done();
+
+  }
+
+  _loadInitialState = async () => { 
+    alert('Loading initial state...');
+    
+    this.setState({
+    	userID: this.props.navigation.state.params.userID,
+    	userName: this.props.navigation.state.params.userName,
+    })
+
+    var theUrl = 'http://127.0.0.1:8000/users/'+this.props.navigation.state.params.userID;
+    console.log("xxxURL: ", theUrl);
+    console.log("USERIDD: ", this.props.navigation.state.params.userID);
+    fetch(theUrl, {
+      method: 'GET',
+      credentials: "same-origin",
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+    })
+
+    .then((response) => response.json())
+    .then((res) => {
+      console.log("reS",res);
+      alert("RES: ",res.toString());
+      if(res.username !== ""){
+        console.log("SUCCESS");
+        alert("success");
+        console.log("RES EMAIL: ", res.email);
+
+        console.log("RES pw: ", res.password);
+        this.setState({
+        	userPass: res.password,
+        });
+        AsyncStorage.setItem('user', JSON.stringify(res));
+      }
+      else{
+        console.log("UNSUCCESFUL");
+        alert("RR",res.message);
+      }
+    })
+    .done();
+  }
 
   render() {
     /* Go ahead and delete ExpoConfigView and replace it with your
@@ -44,6 +95,12 @@ export default class SettingsScreen extends React.Component {
                 My Profile - {this.props.navigation.state.params.userName} - {this.props.navigation.state.params.userID}
            </Text>
          </View>
+          <Text>
+           	Password info fetched from server: {this.state.userPass}
+          </Text>
+          <Text>
+           	Maybe display PROFILE PIC here as well
+          </Text>
       </View>
     );
   }
