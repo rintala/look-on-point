@@ -19,8 +19,14 @@ from rest_framework import routers
 from quickstart import views
 
 from django.conf.urls import url
+
+#For images
+from django.conf.urls.static import static
+from django.conf import settings
+
 # Define router
 router = routers.DefaultRouter()
+
 
 # Register views on the router
 router.register(r'users', views.UserViewSet)
@@ -32,7 +38,10 @@ router.register(r'posts', views.PostViewSet)
 urlpatterns = [
     path('', include(router.urls)),
     path('admin/', admin.site.urls),
-
+    path('upload/', views.FileUploadView.as_view()),
     #url(r'api/', include('api.urls')),
     #path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]
+
+if settings.DEBUG:
+  urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -14,6 +14,13 @@ const dimensions = Dimensions.get('window');
 const imageWidth = dimensions.width;
 const imageHeight = Math.round(dimensions.width * 16 / 12);
 
+// for api calls from expo app during dev
+import {Constants} from 'expo';
+const { manifest } = Constants;
+
+const api = (typeof manifest.packagerOpts === `object`) && manifest.packagerOpts.dev
+  ? 'http://'.concat(manifest.debuggerHost.split(`:`).shift().concat(`:8000`))
+  : `localhost:8000`;
 
 export default class LinksScreen extends React.Component {
   static navigationOptions = {
@@ -23,6 +30,7 @@ export default class LinksScreen extends React.Component {
   state = {
     image: null,
     imageCaption: '',
+    imageName: '',
   }
 
   onPressLogin = () => {
@@ -105,10 +113,8 @@ export default class LinksScreen extends React.Component {
                 onChangeText={(text) => this.setState({imageCaption: text})}
                 value={this.state.imageCaption}
               />
-              {/*/*onChangeText={(text) => this.setState({text})))}*/}
-              <Button
-              title="UPLOAD"
-              onPress={this.uploadImage}/>
+              <Text> IMAGE: {this.state.image}</Text>
+              <Button title="UPLOAD" onPress={this.uploadImage}/>
             </View>
           
           }
@@ -133,11 +139,48 @@ export default class LinksScreen extends React.Component {
     }
   };
 
-  uploadImage = async () =>{
+  uploadImage = () =>{
     // TOOD: complete this upload function
     // take the image from state - upload to static/assets/user_posts
     // create django endpoint for this?
     // post to "api/uploadPostImage" and record in DB with caption/id, etc.
+    const apiUrl = api+'/upload/';
+    const uri = this.state.image;
+    console.log("URI that is used: ", uri);
+    const uriParts = uri.split('.');
+    const beforeFileType = uriParts[uriParts.length-2].split("/");
+    const fileName = beforeFileType[beforeFileType.length-1];
+
+    console.log("FILENAME USED FOR NAMING: ", fileName);
+    const fileType = uriParts[uriParts.length - 1];
+    const formData = new FormData();
+        formData.append('file', {
+          uri,
+          name: `${fileName}.${fileType}`,
+          type: `image/${fileType}`,
+        });
+
+    const options = {
+          method: 'POST',
+          body: formData,
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'multipart/form-data',
+          },
+        };
+
+    this.setState({
+      fileName: fileName,
+    });
+
+    return fetch(apiUrl, options).then(response => {
+        // HTTP 301 response
+        this.props.navigation.navigate('MainFeed',{
+              activeUserID: theUserID,
+              activeUsername: res.username,
+              otherParam: 'anything you want here',
+        });
+    });
   }
 }
 

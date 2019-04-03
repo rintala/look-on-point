@@ -18,3 +18,10 @@ class Comment(models.Model):
     userID = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     content = models.TextField()
     createdOn = models.DateTimeField(auto_now_add=True)
+
+
+# will use MEDIA path defined in settings.py to store image - i.e. not in DB
+class File(models.Model):
+    file = models.FileField(blank=False, null=False)
+    def __str__(self):
+        return self.file.name

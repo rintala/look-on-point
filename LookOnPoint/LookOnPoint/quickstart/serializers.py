@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User, Group
-from .models import Post, Comment
+from .models import Post, Comment, File
 from rest_framework import serializers
 
 
@@ -25,3 +25,9 @@ class CommentSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Comment
         fields = ('commentID', 'postID', 'userID', 'content', 'createdOn')
+
+
+class FileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = File
+        fields = "__all__"
