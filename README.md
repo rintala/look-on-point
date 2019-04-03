@@ -32,6 +32,8 @@ This project is licensed under the MIT License - see the [LICENSE.md](https://gi
 
 ### Dev comments
 
+- **Future:** Add functionality for comparing two outfits - slide image - rate for favorite through radio buttons
+
 - **25 March:** Decided to use SQLite for DB. Primarily since already setup by default with Django backend which will save time. Also found solid plugin for React Native "react-native-sqlite-2".
   - Source: https://pusher.com/tutorials/persisting-data-react-native
   - Shouldnt be necessary - since we can go through Django end points at all times
