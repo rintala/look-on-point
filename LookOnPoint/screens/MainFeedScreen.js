@@ -27,7 +27,7 @@ const { manifest } = Constants;
 const api = (typeof manifest.packagerOpts === `object`) && manifest.packagerOpts.dev
   ? 'http://'.concat(manifest.debuggerHost.split(`:`).shift().concat(`:8000`))
   : `localhost:8000`;
-  
+
 class CommentContent extends Component {
   
     render() {
@@ -53,21 +53,30 @@ class CommentContent extends Component {
 }
 
 export default class MainFeedScreen extends React.Component {
+  
+
   static navigationOptions = {
     title: 'MainFeed',
   };
-
+  
 
   constructor(props) {
      super(props);
+
+     this.extractDynamicUrl = this.extractDynamicUrl.bind(this);
      // get current user from home screen
      const activeUserID = props.navigation.getParam('activeUserID', 'NO-ID');
      const activeUsername = props.navigation.getParam('activeUsername', 'NO-USERNAME');
-     
+     this.mounted = true;
+
      this.state = {
+        isLoading: true,
+        error: null,
+
         postID: 1,
-        posts: [
-          {
+        posts: [],
+
+        /*{
             id: 0,
             url: 'https://media.gq.com/photos/58500ecd524455347e6215c8/master/w_2909,h_4362,c_limit/Kanye-West-Style-2016-12-12-16.jpg',
             showComments: false,
@@ -77,9 +86,7 @@ export default class MainFeedScreen extends React.Component {
             id: 1,
             url: "https://lh5.googleusercontent.com/proxy/w2kecqYtamPR4s80pYCOjUiNV7W8PPABNLI9I_a7RQHB1aWPH4EfLfUjKWL8Egs07YM4NePpD_e8UcS4aQ_u6kHjAlLCuWf48NKBtclU7n_LCU1HdsysAsIC-rZJNlyltFgDlrlR-7yXeMIAzrY3uN3bRetE7zoWbakPlueVly_8vvYOuqtBuAv6EAG0RnThn6mzSHtkTg9DHFT1rVSNaKcDZHJP7anaT6F4oR4LyuVgDpjtg3CIwrisoE9WJIswpU2xhvAI60AJfALtzLyUDuyuuEBwwWl5WjyGMx0Zbtx-yAjA=s0-d",
             showComments: false,
-          }
-        ],
-
+          }*/
         // store username directly here for displaying - instead of userID - good idea?
         // conclusion: yes, since we can still look up more userID through backend, using postID
         // tradeoff - but worth it as of now
@@ -114,7 +121,6 @@ export default class MainFeedScreen extends React.Component {
         'currentUserGroups': "..",
       };
    };
-
 
 
   displayAddNewComment(){
@@ -160,9 +166,11 @@ export default class MainFeedScreen extends React.Component {
       let newPostArray = this.state.posts;
       //TODO: add so it can toggle between true/false dependin on prevState
       newPostArray[postID.id].showComments = true;
+      
       this.setState({
         posts: newPostArray,
       });
+
       console.log("CHANGED showComments to true..", postID);
   };
 
@@ -172,24 +180,117 @@ export default class MainFeedScreen extends React.Component {
 
   handleBlur = () => this.setState({isFocused: false});
   
-  componentWillMount(){
+  componentWillUnmount() {
+    this.mounted = false;
+  };
+
+  extractDynamicUrl(imgUrl){
+      var imgUrlToUseVec = imgUrl.split("/");
+      var imgUrlToUse = api+"/"+imgUrlToUseVec[imgUrlToUseVec.length-2]+"/"+imgUrlToUseVec[imgUrlToUseVec.length-1]
+      console.log("IMGURL TO USE: ",imgUrlToUse);
+      return imgUrlToUse;
+  };
+
+  hi = "IHI";
+
+  componentDidMount(){
       let newFetchedPostArray = this.state.posts;
-      let idToFetch = 1;
-      fetch(api+'/posts/1/', {
+      //let idToFetch = 1;
+      
+      //console.log("MOUNTING: ", this.extractDynamicUrl("post.imgUrl"));
+
+      fetch(api+'/posts/', {
+        method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+       })
+      .then(response => {
+        if (response.ok) {
+          console.log("RESPONSE OK");
+          return response.json();
+        } else {
+          throw new Error("Encountered problem fetching posts...");
+        }
+      })
+      .then(data => {
+        if (this.mounted) {
+          var existingPosts = this.state.posts;
+          for(i=0;i<data.length;i++){
+            existingPosts.push(data[i]);
+          }
+          this.setState({
+            posts: existingPosts,
+            isLoading: false,
+          });
+
+          console.log("STATE1: ", this.state.posts);
+
+          //console.log("loL: ", this.extractDynamicUrl;
+          var postsWithNewUrl = this.state.posts.map((post) => {
+            var newUrl = this.extractDynamicUrl(post.imgUrl);
+            //console.log("NEWURL: "); 
+            return {...post, imgUrlToUse: newUrl}
+          });
+
+          this.setState({
+            posts: postsWithNewUrl
+          });
+
+          console.log("STATE2: ", this.state.posts);
+        }
+        console.log("NOT MOUNTED.. inside of data :/", this.mounted);
+      })
+      .catch(fetchError => {
+        if (this.mounted) {
+          this.setState({
+            isLoading: false,
+            error: fetchError
+          });
+        }
+      });
+
+      /*fetch(api+'/posts/', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
           },
        }).then((response) => response.json())
         .then((responseJson) => {
-     console.log("ALERT"  );
-        })
-        .catch((error) => {
-          console.error(error);
-        });
+          console.log("ALERT"  );
+          console.log("RESPONSEJSON: ", responseJson);
+          
+          if(this.mounted) {
+              var existingPosts = this.state.posts;
+              for(i=0;i<responseJson.length;i++){
+                existingPosts.push(responseJson[i]);
+              }
+              this.setState({
+                posts: existingPosts,
+                isLoading: false,
+              });
+              console.log("STATE1: ", this.state.posts);
+          }
+    
+        }).catch(fetchError => {
+          if (this.mounted) {
+            this.setState({
+              isLoading: false,
+            });
+          }
+      });*/
   };
-
+  
   render() {
+    const { isLoading, comments} = this.state;
+    console.log("ISLOADING STATUS.:. ",isLoading);
+    if (isLoading) {
+      return (
+        <View style={styles.container}>
+          <Text>Loading...</Text>
+        </View>
+      );
+    }
 
     return (
       <View style={styles.container}>
@@ -215,21 +316,23 @@ export default class MainFeedScreen extends React.Component {
                // styling feed posts differently depending on even/odd id
                <View style={[(postInfo.id % 2 == 1) ? styles.oddPost : styles.evenPost]} key={postInfo.id}>
                   <Text style={{textAlign: 'center', fontSize: 47, fontFamily:'Romanesco'}}>
-                    Look {postInfo.id}
+                    Look {postInfo.imgUrlToUse}
                   </Text>
-                  <Image source={{uri: postInfo.url, width: imageWidth, height: imageHeight}} />
+                  
+                  <Image source={{uri: postInfo.imgUrlToUse}}
+                  style={{width: imageWidth, height: imageHeight}} />
                 
                  <View style={styles.bottomFeedPostBar}>
-                    <Text style={{fontStyle: 'italic', color: 'black'}}>USER: MrWest</Text>
+                    <Text style={{fontStyle: 'italic', color: 'black'}}>USER: {postInfo.userID}</Text>
                     <Text>&nbsp; &nbsp; &nbsp;</Text>
-                    <Text style={{fontStyle: 'italic', color: 'black'}}>CAPTION: Back in black</Text>
+                    <Text style={{fontStyle: 'italic', color: 'black'}}>CAPTION: {postInfo.description}</Text>
                   </View>
                   <View style={styles.bottomFeedPostBar}>
                     <Button onPress={() => this.showPostComments(postInfo)}
                       title="comments"/>
                   </View>
 
-                  {/*comment section - display dynamically*/}
+                  {/*comment section - display dynamically
                   {this.state.posts[postInfo.id].showComments == true ? 
                     <ScrollView style={styles.container}>
                       <CommentContent comments={this.state.comments} searchedForPostID={postInfo.id}/>
@@ -249,7 +352,7 @@ export default class MainFeedScreen extends React.Component {
                          }
                          returnKeyType='My Custom button'
                          onSubmitEditing={(event) => this.addCommentToSubmit(event, postInfo.id)}/>
-                        {/*onPress={this.handleRoute.bind(this, 'x')}*/} 
+                        
                          <TouchableOpacity style={styles.submitCommentButton} onPress={() => this.submitNewComment()}>
                           <Text>Comment</Text>
                         </TouchableOpacity>
@@ -259,7 +362,7 @@ export default class MainFeedScreen extends React.Component {
                         <View/>}
                     </ScrollView>
                     : 
-                    <View/>}
+                    <View/>} */}
                 </View>
              );
           })}

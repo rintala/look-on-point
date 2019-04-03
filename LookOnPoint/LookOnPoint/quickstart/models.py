@@ -11,6 +11,7 @@ class Post(models.Model):
 	description = models.TextField()
 	numberLikes = models.PositiveSmallIntegerField(default=0)
 	createdOn = models.DateTimeField(auto_now_add=True)
+	showComments = models.BooleanField(default=False)
 
 class Comment(models.Model):
     commentID = models.AutoField(primary_key=True)

@@ -142,6 +142,7 @@ export default class LinksScreen extends React.Component {
   uploadImage = async () =>{
     // TOOD: complete this upload function
     // record in DB with caption/id, etc.
+    // should be pretty basic - already have api for POST on new feedPosts
 
     const apiUrl = api+'/upload/';
     const uri = this.state.image;
@@ -157,7 +158,7 @@ export default class LinksScreen extends React.Component {
           uri,
           name: `${fileName}.${fileType}`,
           type: `image/${fileType}`,
-        });
+    });
 
     const options = {
           method: 'POST',
@@ -166,7 +167,7 @@ export default class LinksScreen extends React.Component {
             Accept: 'application/json',
             'Content-Type': 'multipart/form-data',
           },
-        };
+    };
 
     this.setState({
       fileName: fileName,
@@ -174,9 +175,9 @@ export default class LinksScreen extends React.Component {
 
     return fetch(apiUrl, options).then(response => {
         // HTTP 301 response
+        console.log("NAVIGATING FORWARDING....");
+
         this.props.navigation.navigate('MainFeed',{
-              activeUserID: theUserID,
-              activeUsername: res.username,
               otherParam: 'anything you want here',
         });
     });
