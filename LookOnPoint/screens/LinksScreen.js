@@ -139,11 +139,10 @@ export default class LinksScreen extends React.Component {
     }
   };
 
-  uploadImage = () =>{
+  uploadImage = async () =>{
     // TOOD: complete this upload function
-    // take the image from state - upload to static/assets/user_posts
-    // create django endpoint for this?
-    // post to "api/uploadPostImage" and record in DB with caption/id, etc.
+    // record in DB with caption/id, etc.
+
     const apiUrl = api+'/upload/';
     const uri = this.state.image;
     console.log("URI that is used: ", uri);
