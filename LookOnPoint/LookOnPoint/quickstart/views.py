@@ -9,6 +9,10 @@ from rest_framework.decorators import action
 from rest_framework import status
 from rest_framework.request import Request
 from django.contrib import messages
+
+# For get users by username
+from rest_framework.decorators import list_route
+from django.shortcuts import get_list_or_404, get_object_or_404
 # SOURCE: https://www.django-rest-framework.org/tutorial/quickstart/
 
 # Create your views here.
@@ -36,7 +40,18 @@ class UserViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+    @list_route(methods=['get'], url_path='retrieve_by_username/(?P<username>\w+)')
+    def getByUsername(self, request, username ):
+        user = get_object_or_404(User, username=username)
         
+        serializer_context = {
+            'request': request,
+        }
+
+        return Response(UserSerializer(user, context=serializer_context).data, status=status.HTTP_200_OK)
+
 class GroupViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows groups to be viewed or edited.

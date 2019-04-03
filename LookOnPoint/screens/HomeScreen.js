@@ -19,6 +19,15 @@ import { MonoText, AmaranthText} from '../components/StyledText';
 
 import SQLite from 'react-native-sqlite-2';
 
+// for api calls from expo app during dev
+import {Constants} from 'expo';
+const { manifest } = Constants;
+
+const api = (typeof manifest.packagerOpts === `object`) && manifest.packagerOpts.dev
+  ? 'http://'.concat(manifest.debuggerHost.split(`:`).shift().concat(`:8000`))
+  : `localhost:8000`;
+
+console.log("API: ",api);
 export default class HomeScreen extends React.Component {
   
   constructor(props){
@@ -47,8 +56,13 @@ export default class HomeScreen extends React.Component {
   // TODO: fix login function - only check - do not add user if not exists - make backend produce correct resp
   onPressLogin = () => {
     alert('Logging you in');
+  }
 
-    fetch('http://127.0.0.1:8000/users/post/', {
+  onPressSignup = () => {
+    alert('Signing you up');
+
+    var urltoPostNewUserTo = api + '/users/post/';
+    fetch(urltoPostNewUserTo, {
       method: 'POST',
       credentials: "same-origin",
       headers: {
@@ -70,7 +84,8 @@ export default class HomeScreen extends React.Component {
         console.log("SUCCESS");
         alert("success");
         AsyncStorage.setItem('user', JSON.stringify(res));
-      
+        
+        // get generated userID
         var theUrl = res.url.split( '/' );
         console.log("theurl:", theUrl);
         var theUserID = theUrl[theUrl.length-2];
@@ -90,11 +105,6 @@ export default class HomeScreen extends React.Component {
     })
     .done();
   }
-  
-  onPressSignup(){
-    alert('Signing you up');
-  }
-
 
   render() {
 

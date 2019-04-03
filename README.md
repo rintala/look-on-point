@@ -11,7 +11,7 @@ Run server:
 
 ```
 source LookOnPoint/env/bin/activate
-python LookOnPoint/LookOnPoint/manage.py runserver
+python LookOnPoint/LookOnPoint/manage.py runserver 0.0.0.0:8000
 ```
 
 Run application:

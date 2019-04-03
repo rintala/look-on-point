@@ -20,6 +20,14 @@ const dimensions = Dimensions.get('window');
 const imageWidth = dimensions.width;
 const imageHeight = Math.round(dimensions.width * 16 / 12);
 
+// for api calls from expo app during dev
+import {Constants} from 'expo';
+const { manifest } = Constants;
+
+const api = (typeof manifest.packagerOpts === `object`) && manifest.packagerOpts.dev
+  ? 'http://'.concat(manifest.debuggerHost.split(`:`).shift().concat(`:8000`))
+  : `localhost:8000`;
+
 export default class SettingsScreen extends React.Component {
   static navigationOptions = {
     title: 'Settings',
@@ -49,7 +57,7 @@ export default class SettingsScreen extends React.Component {
     	userName: this.props.navigation.state.params.userName,
     })
 
-    var theUrl = 'http://127.0.0.1:8000/users/'+this.props.navigation.state.params.userID;
+    var theUrl = api+'/users/'+this.props.navigation.state.params.userID;
     console.log("xxxURL: ", theUrl);
     console.log("USERIDD: ", this.props.navigation.state.params.userID);
     fetch(theUrl, {

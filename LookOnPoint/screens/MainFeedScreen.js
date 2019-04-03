@@ -20,6 +20,14 @@ const dimensions = Dimensions.get('window');
 const imageWidth = dimensions.width;
 const imageHeight = Math.round(dimensions.width * 16 / 12);
 
+// for api calls from expo app during dev
+import {Constants} from 'expo';
+const { manifest } = Constants;
+
+const api = (typeof manifest.packagerOpts === `object`) && manifest.packagerOpts.dev
+  ? 'http://'.concat(manifest.debuggerHost.split(`:`).shift().concat(`:8000`))
+  : `localhost:8000`;
+  
 class CommentContent extends Component {
   
     render() {
@@ -167,7 +175,7 @@ export default class MainFeedScreen extends React.Component {
   componentWillMount(){
       let newFetchedPostArray = this.state.posts;
       let idToFetch = 1;
-      fetch('http://127.0.0.1:8000/posts/1/', {
+      fetch(api+'/posts/1/', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

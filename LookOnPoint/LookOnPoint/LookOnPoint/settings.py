@@ -25,7 +25,7 @@ SECRET_KEY = 'j8=a%8v!6nunjy&l-tn6!9#8)qug+y=pfp=eqm(q26q$1y25df'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Django rest framework
 REST_FRAMEWORK = {
@@ -89,7 +89,7 @@ WSGI_APPLICATION = 'LookOnPoint.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'NAME': os.path.join(BASE_DIR, '    '),
     }
 }
 
@@ -131,3 +131,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+STATICFILES_DIRS = (
+    #This lets Django's collectstatic store our bundles
+    os.path.join(BASE_DIR, 'assets'), 
+    os.path.join(BASE_DIR, 'resources'), 
+)
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'

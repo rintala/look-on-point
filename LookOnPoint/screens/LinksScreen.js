@@ -5,7 +5,8 @@ import { ScrollView,
   View, 
   Image, 
   Button, 
-  Dimensions } from 'react-native';
+  Dimensions,
+  TextInput } from 'react-native';
 import { ExpoLinksView } from '@expo/samples';
 import { ImagePicker } from 'expo';
 
@@ -21,6 +22,7 @@ export default class LinksScreen extends React.Component {
 
   state = {
     image: null,
+    imageCaption: '',
   }
 
   onPressLogin = () => {
@@ -92,21 +94,36 @@ export default class LinksScreen extends React.Component {
           
           <Button
             title="Pick an image from camera roll"
-            onPress={this._pickImage}
+            onPress={this.pickImage}
           />
           {image &&
-            <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />}
+            <View>
+              <Image source={{ uri: image }} style={{ width: 300, height: 400 }} />
+              <TextInput
+                style={{height: 40, borderColor: 'gray', borderWidth: 1}}
+                placeholder='Your style caption...'
+                onChangeText={(text) => this.setState({imageCaption: text})}
+                value={this.state.imageCaption}
+              />
+              {/*/*onChangeText={(text) => this.setState({text})))}*/}
+              <Button
+              title="UPLOAD"
+              onPress={this.uploadImage}/>
+            </View>
+          
+          }
+          
         </View>
         </ScrollView>
       </View>
     );
   }
 
-  _pickImage = async () => {
-    alert("PICKING IMAGE: ");
+  pickImage = async () => {
+    //alert("PICKING IMAGE: ");
     let result = await ImagePicker.launchImageLibraryAsync({
       allowsEditing: true,
-      aspect: [4, 3],
+      aspect: [3, 4],
     });
     
     console.log(result);
@@ -115,6 +132,13 @@ export default class LinksScreen extends React.Component {
       this.setState({ image: result.uri });
     }
   };
+
+  uploadImage = async () =>{
+    // TOOD: complete this upload function
+    // take the image from state - upload to static/assets/user_posts
+    // create django endpoint for this?
+    // post to "api/uploadPostImage" and record in DB with caption/id, etc.
+  }
 }
 
 const styles = StyleSheet.create({
