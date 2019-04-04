@@ -33,3 +33,6 @@
 
 # Mac OS
 .DS_Store
+
+# Exclude media assets
+media/
