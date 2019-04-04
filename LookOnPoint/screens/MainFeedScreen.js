@@ -203,17 +203,19 @@ export default class MainFeedScreen extends React.Component {
   
   };
 
-  showPostComments(postID){
-      console.log("SHOW POST COMMENTS.. ", postID);
-      let newPostArray = this.state.posts;
+  showPostComments(postToSearchFor){
+      console.log("SHOW POST COMMENTS.. ", postToSearchFor.postID);
+      //let newPostArray = this.state.posts;
       //TODO: add so it can toggle between true/false dependin on prevState
-      newPostArray[postID.id].showComments = true;
+      //newPostArray[postID.id].showComments = true;
       
-      this.setState({
-        posts: newPostArray,
-      });
+      let newPostArray = this.state.posts;  
+      let index = newPostArray.findIndex(post => post.postID == postToSearchFor.postID);
+      console.log("INDEXXX: ",index);
+      newPostArray[index].showComments = true;                  
+      this.setState({ posts: newPostArray });
 
-      console.log("CHANGED showComments to true..", postID);
+      console.log("CHANGED showComments to true..", postToSearchFor.postID);
   };
 
   handleFocus = () => this.setState({
@@ -363,10 +365,11 @@ export default class MainFeedScreen extends React.Component {
                       title="comments"/>
                   </View>
 
-                  {/*comment section - display dynamically
-                  {this.state.posts[postInfo.id].showComments == true ? 
+                  {/*comment section - display dynamically*/} 
+                  {console.log("POSTINFO ID ", postInfo.postID, " .. ", this.state.posts[postInfo.postID])}
+                  {postInfo.showComments == true ? 
                     <ScrollView style={styles.container}>
-                      <CommentContent comments={this.state.comments} searchedForPostID={postInfo.id}/>
+                      <CommentContent comments={this.state.comments} searchedForPostID={postInfo.postID}/>
                       <Button type="outline" onPress={() => this.displayAddNewComment()}
                         title="Add new comment"/>
                        {this.state.showCommentInput == true ?
@@ -381,8 +384,8 @@ export default class MainFeedScreen extends React.Component {
                              : 'red'}
                              ]
                          }
-                         returnKeyType='My Custom button'
-                         onSubmitEditing={(event) => this.addCommentToSubmit(event, postInfo.id)}/>
+                        
+                         onSubmitEditing={(event) => this.addCommentToSubmit(event, postInfo.postID)}/>
                         
                          <TouchableOpacity style={styles.submitCommentButton} onPress={() => this.submitNewComment()}>
                           <Text>Comment</Text>
@@ -393,7 +396,7 @@ export default class MainFeedScreen extends React.Component {
                         <View/>}
                     </ScrollView>
                     : 
-                    <View/>} */}
+                    <View/>}
                 </View>
              );
           })}
