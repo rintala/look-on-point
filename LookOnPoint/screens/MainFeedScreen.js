@@ -12,6 +12,7 @@ import {
   Alert,
   TouchableHighlight,
   TouchableOpacity,
+  RefreshControl,
 
  } from 'react-native';
 import { ExpoLinksView } from '@expo/samples';
@@ -70,6 +71,7 @@ export default class MainFeedScreen extends React.Component {
      this.mounted = true;
 
      this.state = {
+        refreshing: false,
         isLoading: true,
         error: null,
 
@@ -122,6 +124,46 @@ export default class MainFeedScreen extends React.Component {
       };
    };
 
+  fetchPosts(){
+    console.log("FETCHING POSTS!...");
+    return fetch(api+'/posts/', {
+        method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+       })
+      .then(response => {
+        if (response.ok) {
+          console.log("RESPONSE OK");
+          return response.json();
+        } else {
+          throw new Error("Encountered problem fetching posts...");
+        }
+      })
+      .then(data => {
+        //if (this.mounted) {
+          var existingPosts = this.state.posts;
+          /*for(i=0;i<data.length;i++){
+            existingPosts.push(data[i]);
+          }*/
+
+          // Set to data directly - will overwrite any prev posts not in DB
+          console.log("Setting new state...");
+          this.setState({
+            posts: data,
+            isLoading: false,
+          });
+        //}
+
+      })
+  };
+
+  _onRefresh = () => {
+    this.setState({refreshing: true});
+    this.fetchPosts().then(() => {
+      this.setState({refreshing: false});
+    });
+  }
 
   displayAddNewComment(){
     //alert("Adding new comment - show new component...");
@@ -219,6 +261,7 @@ export default class MainFeedScreen extends React.Component {
           for(i=0;i<data.length;i++){
             existingPosts.push(data[i]);
           }
+
           this.setState({
             posts: existingPosts,
             isLoading: false,
@@ -228,9 +271,9 @@ export default class MainFeedScreen extends React.Component {
 
           //console.log("loL: ", this.extractDynamicUrl;
           var postsWithNewUrl = this.state.posts.map((post) => {
-            var newUrl = this.extractDynamicUrl(post.imgUrl);
-            //console.log("NEWURL: "); 
-            return {...post, imgUrlToUse: newUrl}
+            //var newUrl = this.hi;
+            //console.log("NEWURL1: ", this.extractDynamicUrl(post.imgUrl)); 
+            return {...post, imgUrlToUse: this.extractDynamicUrl(post.imgUrl)}
           });
 
           this.setState({
@@ -250,35 +293,7 @@ export default class MainFeedScreen extends React.Component {
         }
       });
 
-      /*fetch(api+'/posts/', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-       }).then((response) => response.json())
-        .then((responseJson) => {
-          console.log("ALERT"  );
-          console.log("RESPONSEJSON: ", responseJson);
-          
-          if(this.mounted) {
-              var existingPosts = this.state.posts;
-              for(i=0;i<responseJson.length;i++){
-                existingPosts.push(responseJson[i]);
-              }
-              this.setState({
-                posts: existingPosts,
-                isLoading: false,
-              });
-              console.log("STATE1: ", this.state.posts);
-          }
-    
-        }).catch(fetchError => {
-          if (this.mounted) {
-            this.setState({
-              isLoading: false,
-            });
-          }
-      });*/
+      
   };
   
   render() {
@@ -300,8 +315,15 @@ export default class MainFeedScreen extends React.Component {
            </Text>
            
          </View>
-         <Button style={{textAlign: 'center', color: 'white', fontSize: 37, fontFamily:'Romanesco'}} title="My Profile" onPress={() => 
+         <Button style={{flex: 1, textAlign: 'center', color: 'white', width: '50%',  fontSize: 37, fontFamily:'Romanesco'}} title="My Profile" onPress={() => 
             this.props.navigation.navigate('Settings',{
+              userName: this.state.currentUserUsername,
+              userID: this.state.currentUserID,
+              otherParam: 'anything you want here',
+            })
+           }/> 
+           <Button style={{flex: 1, textAlign: 'center', color: 'purple', width: '50%', fontSize: 37, fontFamily:'Romanesco'}} title="Add new post" onPress={() => 
+            this.props.navigation.navigate('Links',{
               userName: this.state.currentUserUsername,
               userID: this.state.currentUserID,
               otherParam: 'anything you want here',
@@ -309,17 +331,26 @@ export default class MainFeedScreen extends React.Component {
            }/> 
          
 
-      <ScrollView style={styles.container}>
+      <ScrollView style={styles.container}
+
+        refreshControl={
+            <RefreshControl
+              refreshing={this.state.refreshing}
+              onRefresh={this._onRefresh}
+            />
+          }
+
+      >
          {this.state.posts.map(postInfo => {
              return (
 
                // styling feed posts differently depending on even/odd id
-               <View style={[(postInfo.id % 2 == 1) ? styles.oddPost : styles.evenPost]} key={postInfo.id}>
+               <View key={postInfo.postID} style={[(postInfo.postID % 2 == 1) ? styles.oddPost : styles.evenPost]} key={postInfo.id}>
                   <Text style={{textAlign: 'center', fontSize: 47, fontFamily:'Romanesco'}}>
-                    Look {postInfo.imgUrlToUse}
+                    Look {postInfo.imgUrl}
                   </Text>
                   
-                  <Image source={{uri: postInfo.imgUrlToUse}}
+                  <Image source={{uri: postInfo.imgUrl}} 
                   style={{width: imageWidth, height: imageHeight}} />
                 
                  <View style={styles.bottomFeedPostBar}>

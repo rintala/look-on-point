@@ -83,7 +83,7 @@ export default class HomeScreen extends React.Component {
       if(res.username !== ""){
         console.log("SUCCESS");
         alert("success");
-        AsyncStorage.setItem('user', JSON.stringify(res));
+        //AsyncStorage.setItem('user', JSON.stringify(res));
         
         // get generated userID
         var theUrl = res.url.split( '/' );

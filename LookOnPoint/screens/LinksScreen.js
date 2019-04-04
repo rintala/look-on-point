@@ -31,12 +31,20 @@ export default class LinksScreen extends React.Component {
     image: null,
     imageCaption: '',
     imageName: '',
+    fileName: '',
+    fileNameToRecord: '',
+    userID: '',
+    userName: '',
+    showComments: false,
+    numberOfLikes: 0,
+    description: '',
+
   }
 
   onPressLogin = () => {
     alert('Logging you in');
 
-    fetch('http://127.0.0.1:8000/users/post/', {
+    fetch('http://127.0.0.1:8000/upload', {
       method: 'POST',
       credentials: "same-origin",
       headers: {
@@ -79,6 +87,12 @@ export default class LinksScreen extends React.Component {
     .done();
   }
   
+  componentDidMount(){
+    this.setState({
+      userID: this.props.navigation.state.params.userID,
+      userName: this.props.navigation.state.params.userName,
+    });
+  }
   render() {
     const { image } = this.state
 
@@ -144,7 +158,7 @@ export default class LinksScreen extends React.Component {
     // record in DB with caption/id, etc.
     // should be pretty basic - already have api for POST on new feedPosts
 
-    const apiUrl = api+'/upload/';
+    const uploadApiUrl = api+'/upload/';
     const uri = this.state.image;
     console.log("URI that is used: ", uri);
     const uriParts = uri.split('.');
@@ -153,6 +167,8 @@ export default class LinksScreen extends React.Component {
 
     console.log("FILENAME USED FOR NAMING: ", fileName);
     const fileType = uriParts[uriParts.length - 1];
+    console.log("FILENAME USED FOR NAMING: ", api+fileName+fileType);
+    
     const formData = new FormData();
         formData.append('file', {
           uri,
@@ -171,16 +187,46 @@ export default class LinksScreen extends React.Component {
 
     this.setState({
       fileName: fileName,
+      fileNameToRecord: api+"/media/"+fileName+"."+fileType,
+
     });
 
-    return fetch(apiUrl, options).then(response => {
+    // TODO: add fetch to POST post-data to backend
+
+    return fetch(uploadApiUrl, options).then(response => {
         // HTTP 301 response
         console.log("NAVIGATING FORWARDING....");
 
         this.props.navigation.navigate('MainFeed',{
               otherParam: 'anything you want here',
         });
-    });
+    }).then(() => {
+
+      var urltoPostNewPostTo = api + '/posts/';
+      fetch(urltoPostNewPostTo, {
+        method: 'POST',
+        credentials: "same-origin",
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+
+        body: JSON.stringify({
+          userID: api+'/users/'+this.state.userID+'/',
+          imgUrl: this.state.fileNameToRecord ,
+          description: this.state.imageCaption,
+          showComments: this.state.showComments,
+        })
+      })
+
+      .then((response) => response.json())
+      .then((res) => {
+        console.log("reS",res);
+        //alert("RES: ",res.toString());
+      })
+      .done();
+      }
+    );
   }
 }
 

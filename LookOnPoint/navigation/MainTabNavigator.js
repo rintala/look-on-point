@@ -61,7 +61,8 @@ SettingsStack.navigationOptions = {
 // Main feed
 const MainFeedStack = createStackNavigator({
   MainFeed: MainFeedScreen,
-  Settings: SettingsScreen
+  Settings: SettingsScreen,
+  Links: LinksScreen,
 });
 
 LinksStack.navigationOptions = {
@@ -76,7 +77,7 @@ LinksStack.navigationOptions = {
 
 export default createBottomTabNavigator({
   HomeStack,
-  LinksStack,
+  //LinksStack,
   MainFeedStack,
   //SettingsStack,
 });
