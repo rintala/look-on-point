@@ -35,6 +35,9 @@ This project is licensed under the MIT License - see the [LICENSE.md](https://gi
 - **Future:** 
 	- Add functionality for comparing two outfits - slide image - rate for favorite through radio buttons.
 	- MainFeed: on drag up - fetch new posts and update/refresh feed.
+	- Comments - push to DB
+	- Comments - implement sockets for live updating comments
+	- Authentication - complete auth with existing signup/login - add logout and make it all token-based
 
 - **25 March:** Decided to use SQLite for DB. Primarily since already setup by default with Django backend which will save time. Also found solid plugin for React Native "react-native-sqlite-2".
   - Source: https://pusher.com/tutorials/persisting-data-react-native
