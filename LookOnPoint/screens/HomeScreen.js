@@ -34,7 +34,9 @@ export default class HomeScreen extends React.Component {
     super(props);
     this.state = {
       username: "",
-      password: "",
+      password1: "",
+      password2: "",
+      confirmSignup: false,
     }
   }
 
@@ -54,15 +56,11 @@ export default class HomeScreen extends React.Component {
   }
 
   // TODO: fix login function - only check - do not add user if not exists - make backend produce correct resp
-  onPressLogin = () => {
+  onPressLogin = async () => {
     alert('Logging you in');
-  }
 
-  onPressSignup = () => {
-    alert('Signing you up');
-
-    var urltoPostNewUserTo = api + '/users/post/';
-    fetch(urltoPostNewUserTo, {
+    var urltoPostNewUserTo = api + '/rest-auth/login/';
+    await fetch(urltoPostNewUserTo, {
       method: 'POST',
       credentials: "same-origin",
       headers: {
@@ -80,23 +78,92 @@ export default class HomeScreen extends React.Component {
     .then((res) => {
       console.log("reS",res);
       //alert("RES: ",res.toString());
-      if(res.username !== ""){
+      if(res.user !== ""){
+        console.log("SUCCESS");
+        alert("success");
+        
+        var userToken = res.token;
+        var theUserID = res.user.pk;
+
+        console.log("USERID:", theUserID);
+        
+        // Save our token to asyncstorage
+        try {
+          AsyncStorage.setItem(STORAGE_KEY, userToken);
+        } catch (error) {
+          console.log('AsyncStorage error: ' + error.message);
+        }
+
+        this.props.navigation.navigate('MainFeed',{
+              activeUserID: theUserID,
+              activeUsername: res.user.username,
+              otherParam: 'anything you want here',
+              activeUserToken: userToken,
+        });
+      }
+      else{
+        console.log("UNSUCCESFUL");
+        alert("RR",res.message);
+      }
+    })
+    .done();
+
+  }
+
+  onPressSignup = () => {
+    if(this.state.confirmSignup == false){
+    alert("initialitizing signing up process");
+    this.setState({
+      confirmSignup: true
+    });
+    } else{
+      this.onPressSignupConfirm();
+    }
+  }
+
+  onPressSignupConfirm = () => {
+    alert('Signing you up');
+
+    var urltoPostNewUserTo = api + '/rest-auth/registration/';
+    fetch(urltoPostNewUserTo, {
+      method: 'POST',
+      credentials: "same-origin",
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+
+      body: JSON.stringify({
+        username: this.state.username,
+        password1: this.state.password,
+        password2: this.state.password2,
+      })
+    })
+
+    .then((response) => response.json())
+    .then((res) => {
+      console.log("reS",res);
+      //alert("RES: ",res.toString());
+      if(res.user !== ""){
         console.log("SUCCESS");
         alert("success");
         //AsyncStorage.setItem('user', JSON.stringify(res));
         
         // get generated userID
-        var theUrl = res.url.split( '/' );
-        console.log("theurl:", theUrl);
-        var theUserID = theUrl[theUrl.length-2];
+        //var theUrl = res.url.split( '/' );
+        //console.log("theurl:", theUrl);
+        //var theUserID = theUrl[theUrl.length-2];
+        var userToken = res.token;
+        var theUserID = res.user.pk;
 
         console.log("USERID:", theUserID);
 
         this.props.navigation.navigate('MainFeed',{
               activeUserID: theUserID,
-              activeUsername: res.username,
+              activeUsername: res.user.username,
               otherParam: 'anything you want here',
-            });
+              usertoken: userToken,
+        });
       }
       else{
         console.log("UNSUCCESFUL");
@@ -105,6 +172,7 @@ export default class HomeScreen extends React.Component {
     })
     .done();
   }
+  
 
   render() {
 
@@ -114,7 +182,7 @@ export default class HomeScreen extends React.Component {
         <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
           <ImageBackground
                   style={styles.iconGirlBg} source={require('../assets/images/icon-girl-medium.png')}
-                >  
+                >
             <View style={styles.welcomeContainer}>
               {/*<Image
                 source={
@@ -138,6 +206,14 @@ export default class HomeScreen extends React.Component {
                 </Text>
                 <TextInput placeholder='Username' onChangeText={ (username) => this.setState({username})}/>
                 <TextInput placeholder='Password' onChangeText={ (password) => this.setState({password})}/>
+                {this.state.confirmSignup == true ?
+                <View>
+                  <TextInput placeholder='Password2' onChangeText={ (password2) => this.setState({password2})}/>
+                </View>
+                :
+                <View/>
+                }
+                
                 <View style={{marginTop: 16, marginBottom: 16, width: 100}}>
                   <Button buttonStyle={styles.loginButton} title=" LOGIN " onPress={this.onPressLogin} color="#400080"/>
                 </View>

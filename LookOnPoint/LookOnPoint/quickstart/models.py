@@ -1,7 +1,16 @@
 from django.db import models
 from django.conf import settings
 
+# For CustomUser creation
+from django.contrib.auth.models import AbstractUser
+
 # Create your models here.
+class CustomUser(AbstractUser):
+	# Additional fields, except ones inherited from AbstractUser
+ 	createdOn = models.DateTimeField(auto_now_add=True)
+ 	username = models.TextField(unique=True)
+ 	userID = models.AutoField(primary_key=True)
+
 class Post(models.Model):
 	postID = models.AutoField(primary_key=True)
 	userID = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)

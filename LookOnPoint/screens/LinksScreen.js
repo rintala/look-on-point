@@ -6,13 +6,15 @@ import { ScrollView,
   Image, 
   Button, 
   Dimensions,
-  TextInput } from 'react-native';
+  TextInput,
+  AsyncStorage } from 'react-native';
 import { ExpoLinksView } from '@expo/samples';
 import { ImagePicker } from 'expo';
 
 const dimensions = Dimensions.get('window');
 const imageWidth = dimensions.width;
 const imageHeight = Math.round(dimensions.width * 16 / 12);
+var STORAGE_KEY = 'id_token';
 
 // for api calls from expo app during dev
 import {Constants} from 'expo';
@@ -35,62 +37,18 @@ export default class LinksScreen extends React.Component {
     fileNameToRecord: '',
     userID: '',
     userName: '',
+    userToken: '',
     showComments: false,
     numberOfLikes: 0,
     description: '',
 
-  }
-
-  onPressLogin = () => {
-    alert('Logging you in');
-
-    fetch('http://127.0.0.1:8000/upload', {
-      method: 'POST',
-      credentials: "same-origin",
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-
-      body: JSON.stringify({
-        username: this.state.username,
-        password: this.state.password,
-      })
-    })
-
-    .then((response) => response.json())
-    .then((res) => {
-      console.log("reS",res);
-      //alert("RES: ",res.toString());
-      if(res.username !== ""){
-        console.log("SUCCESS");
-        alert("success");
-        AsyncStorage.setItem('user', JSON.stringify(res));
-      
-        var theUrl = res.url.split( '/' );
-        console.log("theurl:", theUrl);
-        var theUserID = theUrl[theUrl.length-2];
-
-        console.log("USERID:", theUserID);
-
-        this.props.navigation.navigate('MainFeed',{
-              activeUserID: theUserID,
-              activeUsername: res.username,
-              otherParam: 'anything you want here',
-            });
-      }
-      else{
-        console.log("UNSUCCESFUL");
-        alert("RR",res.message);
-      }
-    })
-    .done();
   }
   
   componentDidMount(){
     this.setState({
       userID: this.props.navigation.state.params.userID,
       userName: this.props.navigation.state.params.userName,
+      userToken: this.props.navigation.state.params.userAuthToken,
     });
   }
   render() {
@@ -110,7 +68,8 @@ export default class LinksScreen extends React.Component {
 
         <ScrollView>
         <View>
-           <Text> ... </Text>
+           <Text> Token: {this.state.userToken} </Text>
+
          </View>
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
           
@@ -153,11 +112,13 @@ export default class LinksScreen extends React.Component {
     }
   };
 
-  uploadImage = async () =>{
+  // uploadImage = async () => {
+  uploadImage = async () => {
     // TOOD: complete this upload function
     // record in DB with caption/id, etc.
     // should be pretty basic - already have api for POST on new feedPosts
-
+    var USER_TOKEN = await AsyncStorage.getItem(STORAGE_KEY);
+    console.log("USERXXX TOKEN: ", USER_TOKEN);
     const uploadApiUrl = api+'/upload/';
     const uri = this.state.image;
     console.log("URI that is used: ", uri);
@@ -192,41 +153,47 @@ export default class LinksScreen extends React.Component {
     });
 
     // TODO: add fetch to POST post-data to backend
-
-    return fetch(uploadApiUrl, options).then(response => {
+    /*refreshAfterNavigation = () => {
+      this.setState({refreshing: true});
+      this.fetchPosts().then(() => {
+        this.setState({refreshing: false});
+    });}*/
+  
+    //return 
+    fetch(uploadApiUrl, options
+      ).then((response) => {
         // HTTP 301 response
-        console.log("NAVIGATING FORWARDING....");
+        return response.json();
+      }).then((data) => {
+        var urltoPostNewPostTo = api + '/posts/';
+        
+        return fetch(urltoPostNewPostTo, {
+          method: 'POST',
+          credentials: "same-origin",
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + USER_TOKEN,
+          },
 
-        this.props.navigation.navigate('MainFeed',{
-              otherParam: 'anything you want here',
-        });
-    }).then(() => {
-
-      var urltoPostNewPostTo = api + '/posts/';
-      fetch(urltoPostNewPostTo, {
-        method: 'POST',
-        credentials: "same-origin",
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-
-        body: JSON.stringify({
-          userID: api+'/users/'+this.state.userID+'/',
-          imgUrl: this.state.fileNameToRecord ,
-          description: this.state.imageCaption,
-          showComments: this.state.showComments,
-        })
-      })
-
-      .then((response) => response.json())
-      .then((res) => {
-        console.log("reS",res);
-        //alert("RES: ",res.toString());
-      })
-      .done();
-      }
-    );
+          body: JSON.stringify({
+            userID: api+'/users/'+this.state.userID+'/',
+            imgUrl: this.state.fileNameToRecord ,
+            description: this.state.imageCaption,
+            showComments: this.state.showComments,
+          })
+      });
+      
+      }).then((response) => {
+              this.props.navigation.navigate('MainFeed',{
+                  activeUserID: this.state.userID,
+                  
+            });
+            return response.json();
+            
+      }).catch(function(error){
+            console.log("An error occured while fetching.. ", error);
+      });
   }
 }
 

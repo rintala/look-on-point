@@ -22,6 +22,15 @@ npm start
 
 - Then follow Expo instructions for displaying app on either Android/iOS emulator or smartphone.
 
+View tables in database from terminal - in dir: root/LookOnPoint/LookOnPoint:
+
+```
+sqlite3 database.db
+.tables
+```
+
+
+
 ### Authors
 
 - **Jonathan Rintala**
@@ -33,11 +42,42 @@ This project is licensed under the MIT License - see the [LICENSE.md](https://gi
 ### Dev comments
 
 - **Future:** 
-	- Add functionality for comparing two outfits - slide image - rate for favorite through radio buttons.
-	- MainFeed: on drag up - fetch new posts and update/refresh feed.
-	- Comments - push to DB
-	- Comments - implement sockets for live updating comments
-	- Authentication - complete auth with existing signup/login - add logout and make it all token-based
+  - Add functionality for comparing two outfits - slide image - rate for favorite through radio buttons.
+
+  - MainFeed: on drag up - fetch new posts and update/refresh feed.
+
+  - Comments - push to DB
+
+  - Comments - implement sockets for live updating comments
+
+  - Authentication - complete auth with existing signup/login - add logout and make it all token-based (high priority)
+
+    
+
+- **8 April:**
+
+  - After tideous bug research - found that restart of app after imagePicker is a dev issue - will resolve once app is published
+  - Similar:
+    <https://github.com/react-native-community/react-native-image-picker/issues/471>
+
+- **7 April:**
+
+  - Added hashing using Django's built in user and password management system
+  - Source: <https://docs.djangoproject.com/en/2.1/topics/auth/passwords/>
+
+  
+
+  - Setup Tokens with time limit:
+
+    - ```
+      pip install django-rest-auth
+      pip install djangorestframework-jwt
+      pip install django-allauth
+      ```
+
+      <https://michaelwashburnjr.com/django-user-authentication/>
+
+  
 
 - **25 March:** Decided to use SQLite for DB. Primarily since already setup by default with Django backend which will save time. Also found solid plugin for React Native "react-native-sqlite-2".
   - Source: https://pusher.com/tutorials/persisting-data-react-native

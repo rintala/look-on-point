@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
+import datetime
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -28,11 +29,39 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 
 # Django rest framework
-REST_FRAMEWORK = {
+'''REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication'
     ]
+}'''
+
+
+# Configure the JWTs to expire after 1 hour, and allow users to refresh near-expiration tokens
+JWT_AUTH = {
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(hours=1),
+    'JWT_ALLOW_REFRESH': True,
 }
+
+# Make JWT Auth the default authentication mechanism for Django
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        #'quickstart.permissions.IsGetOrIsAuthenticated',
+    ),
+}
+
+# Enables django-rest-auth to use JWT tokens instead of regular tokens.
+REST_USE_JWT = True
+
+SITE_ID = 1
+
+# For registration of new users
+REST_AUTH_REGISTER_SERIALIZERS = {
+    'REGISTER_SERIALIZER': 'rest_auth.registration.serializers.RegisterSerializer',
+}
+
+# instead of sending email with token to user - print to console 
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Application definition
 
@@ -43,13 +72,19 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
-    
+    # 'django.contrib.sites',
+    'rest_framework.authtoken',
+    'rest_auth',
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'rest_auth.registration',
     #Register our rest_framework
     'rest_framework',
 
     #Register app for models to work
-    'quickstart.apps.QuickstartConfig'
+    'quickstart.apps.QuickstartConfig',
+
 ]
 
 MIDDLEWARE = [
@@ -85,11 +120,11 @@ WSGI_APPLICATION = 'LookOnPoint.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
-
+print("SETTINGS, db loc: ", os.path.join(BASE_DIR))
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, '    '),
+        'NAME': os.path.join(BASE_DIR, 'database.db'),
     }
 }
 
@@ -112,6 +147,18 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Password hashing - priority list
+# https://docs.djangoproject.com/en/2.1/topics/auth/passwords/
+    
+PASSWORD_HASHERS = [
+    'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+    'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+    'django.contrib.auth.hashers.Argon2PasswordHasher',
+    'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
+]
+
+# Add custom user model 
+AUTH_USER_MODEL = 'quickstart.CustomUser'
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/

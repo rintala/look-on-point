@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React from 'react';
 import { 
   ScrollView, 
   StyleSheet, 
@@ -29,7 +29,7 @@ const api = (typeof manifest.packagerOpts === `object`) && manifest.packagerOpts
   ? 'http://'.concat(manifest.debuggerHost.split(`:`).shift().concat(`:8000`))
   : `localhost:8000`;
 
-class CommentContent extends Component {
+class CommentContent extends React.Component {
   
     render() {
       return (
@@ -68,10 +68,15 @@ export default class MainFeedScreen extends React.Component {
      // get current user from home screen
      const activeUserID = props.navigation.getParam('activeUserID', 'NO-ID');
      const activeUsername = props.navigation.getParam('activeUsername', 'NO-USERNAME');
+     const refreshing = props.navigation.getParam('refreshing', false);
+     const activeUserToken = props.navigation.getParam('activeUserToken', 'NO-USERTOKEN');
+     // const { params} = this.props.navigation.state;
+     // params.refreshingAfterNavigation();
+
      this.mounted = true;
 
      this.state = {
-        refreshing: false,
+        refreshing: refreshing,
         isLoading: true,
         error: null,
 
@@ -121,6 +126,7 @@ export default class MainFeedScreen extends React.Component {
         'currentUserUsername': activeUsername, 
         'currentUserEmail': "..", 
         'currentUserGroups': "..",
+        'currentUserToken': activeUserToken,
       };
    };
 
@@ -157,6 +163,15 @@ export default class MainFeedScreen extends React.Component {
 
       })
   };
+
+  /* Seems to already be done by default..
+  componentWillReceiveProps(nextProps) {
+    console.log("WILL RECIEBEP PROPS..");
+    if (nextProps.navigation.state.params.refreshing) {
+      console.log("INVOKE REFREHS FEEED");
+      this._onRefresh();
+    }
+  }*/
 
   _onRefresh = () => {
     this.setState({refreshing: true});
@@ -321,16 +336,18 @@ export default class MainFeedScreen extends React.Component {
             this.props.navigation.navigate('Settings',{
               userName: this.state.currentUserUsername,
               userID: this.state.currentUserID,
+              userAuthToken: this.state.currentUserToken,
               otherParam: 'anything you want here',
             })
-           }/> 
-           <Button style={{flex: 1, textAlign: 'center', color: 'purple', width: '50%', fontSize: 37, fontFamily:'Romanesco'}} title="Add new post" onPress={() => 
-            this.props.navigation.navigate('Links',{
-              userName: this.state.currentUserUsername,
-              userID: this.state.currentUserID,
-              otherParam: 'anything you want here',
-            })
-           }/> 
+         }/>
+         <Button style={{flex: 1, textAlign: 'center', color: 'purple', width: '50%', fontSize: 37, fontFamily:'Romanesco'}} title="Add new post" onPress={() => 
+          this.props.navigation.navigate('Links',{
+            userName: this.state.currentUserUsername,
+            userID: this.state.currentUserID,
+            userAuthToken: this.state.currentUserToken,
+            otherParam: 'anything you want here',
+          })
+         }/> 
          
 
       <ScrollView style={styles.container}
@@ -366,7 +383,7 @@ export default class MainFeedScreen extends React.Component {
                   </View>
 
                   {/*comment section - display dynamically*/} 
-                  {console.log("POSTINFO ID ", postInfo.postID, " .. ", this.state.posts[postInfo.postID])}
+                  {/* NOT HOW THEY ARE RETRIEVED:.. console.log("POSTINFO ID ", postInfo.postID, " .. ", this.state.posts[postInfo.postID])*/}
                   {postInfo.showComments == true ? 
                     <ScrollView style={styles.container}>
                       <CommentContent comments={this.state.comments} searchedForPostID={postInfo.postID}/>
@@ -384,7 +401,7 @@ export default class MainFeedScreen extends React.Component {
                              : 'red'}
                              ]
                          }
-                        
+                          
                          onSubmitEditing={(event) => this.addCommentToSubmit(event, postInfo.postID)}/>
                         
                          <TouchableOpacity style={styles.submitCommentButton} onPress={() => this.submitNewComment()}>

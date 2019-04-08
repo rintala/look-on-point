@@ -20,9 +20,12 @@ from quickstart import views
 
 from django.conf.urls import url
 
-#For images
+# For images
 from django.conf.urls.static import static
 from django.conf import settings
+
+# For being able to refresh tokens
+from rest_framework_jwt.views import refresh_jwt_token
 
 # Define router
 router = routers.DefaultRouter()
@@ -39,9 +42,16 @@ urlpatterns = [
     path('', include(router.urls)),
     path('admin/', admin.site.urls),
     path('upload/', views.FileUploadView.as_view()),
+    path('addUser/', views.CustomUserView.as_view()),
+    path('rest/addPost/', views.SubmitPostView.as_view()),
     #url(r'api/', include('api.urls')),
-    #path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
+    #path('auth/', include('django.contrib.auth.urls')),
+    url(r'^rest-auth/', include('rest_auth.urls')),
+    url(r'^rest-auth/registration/', include('rest_auth.registration.urls')),
+    url(r'custom/registration/', views.CustomRegisterView.as_view(), name='my_custom_registration'),
+    url(r'^refresh-token/', refresh_jwt_token),
 ]
+
 
 if settings.DEBUG:
   urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
