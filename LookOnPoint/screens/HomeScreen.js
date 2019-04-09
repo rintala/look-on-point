@@ -28,6 +28,9 @@ const api = (typeof manifest.packagerOpts === `object`) && manifest.packagerOpts
   : `localhost:8000`;
 
 console.log("API: ",api);
+
+var STORAGE_KEY = 'id_token';
+
 export default class HomeScreen extends React.Component {
   
   constructor(props){
@@ -90,6 +93,7 @@ export default class HomeScreen extends React.Component {
         // Save our token to asyncstorage
         try {
           AsyncStorage.setItem(STORAGE_KEY, userToken);
+          console.log("asyncstorage success");
         } catch (error) {
           console.log('AsyncStorage error: ' + error.message);
         }
@@ -160,9 +164,9 @@ export default class HomeScreen extends React.Component {
 
         this.props.navigation.navigate('MainFeed',{
               activeUserID: theUserID,
-              activeUsername: res.user.username,
+              activeUsername: this.state.username,
               otherParam: 'anything you want here',
-              usertoken: userToken,
+              userToken: userToken,
         });
       }
       else{

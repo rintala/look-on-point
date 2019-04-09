@@ -9,6 +9,10 @@ import {Provider} from 'react-redux'
 import configureStore from './store/store.js'
 const store = configureStore()
 
+if(__DEV__) {
+  import('./ReactotronConfig').then(() => console.log('Reactotron Configured'))
+}
+
 export default class App extends React.Component {
   state = {
     isLoadingComplete: false,
