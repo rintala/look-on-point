@@ -31,6 +31,7 @@ User = get_user_model()
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.authentication import TokenAuthentication
 from rest_framework_jwt.serializers import VerifyJSONWebTokenSerializer
+from django.core.exceptions import ValidationError
 
 # Create your views here.
 
@@ -238,7 +239,7 @@ class SubmitCommentView(APIView):
                 messages.success(request._request, 'Success')
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             else:
-                raise ValidationError("Sorry, you are trying to post as another user which is forbidden..")
+                raise ValidationError("Sorry, you are trying to comment as another user which is forbidden..")
         
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
