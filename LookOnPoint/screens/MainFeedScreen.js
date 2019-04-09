@@ -41,7 +41,7 @@ class CommentContent extends React.Component {
   
         <View>
           <Text>{this.props.searchedForPostID}</Text>
-          {comments.reverse().map(commentInfo => {
+          {comments.map(commentInfo => {
              return commentInfo.postID == this.props.searchedForPostID ?
                 //use approach 3 - proposed by 
                 //source: https://medium.com/@szholdiyarov/conditional-rendering-in-react-native-286351816db4
@@ -235,7 +235,8 @@ export default class MainFeedScreen extends React.Component {
     console.log("POST INFO TO SEND TO BACKEND: ", this.state.commentToSubmit);
     console.log("POSTID TO USE: ", api+'/posts/'+this.state.commentToSubmit.postID+'/')
     console.log("USERID TO USE: ", api+'/users/'+this.state.currentUserID+'/')
-    fetch(urltoPostNewPostTo, {
+    
+    return fetch(urltoPostNewPostTo, {
           method: 'POST',
           credentials: "same-origin",
           headers: {
@@ -291,16 +292,25 @@ export default class MainFeedScreen extends React.Component {
     
     // Update state with new comment for instant view update
     let newCommentsArray = this.state.comments;
-    newCommentsArray.push(this.state.commentToSubmit);
-    console.log("NEWCOMMENTSARRYA: ",newCommentsArray);
-
-    this.setState({
-      comments: newCommentsArray,
-      isLoading: false,
-    });
-
+    
     // POST comment to backend
-    this.postCommentToBackend();
+    this.postCommentToBackend().then(data => {
+        console.log("commentID: ",data.commentID);
+
+        // Recreate comment object structure
+        newComment = this.state.commentToSubmit;
+        newComment.commentID = data.commentID;
+        newComment.postID = api+"/posts/"+newComment.postID+"/";
+        newComment.userID = api+"/users/"+newComment.userID+"/";
+        newComment.createdOn = data.createdOn;
+        newCommentsArray.push(newComment);
+        console.log("NEWCOMMENTSARRYA: ",newCommentsArray);
+
+        this.setState({
+          comments: newCommentsArray,
+          isLoading: false,
+        });
+    });
     
     // TODO: emit change to socket - instant update for all other users (listeners)
   };
