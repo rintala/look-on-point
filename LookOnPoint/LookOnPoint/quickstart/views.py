@@ -10,6 +10,8 @@ from rest_framework import status
 from rest_framework.request import Request
 from django.contrib import messages
 
+import json
+
 # For get users by username
 from rest_framework.decorators import list_route
 from django.shortcuts import get_list_or_404, get_object_or_404
@@ -127,31 +129,30 @@ class SubmitPostView(APIView):
     @action(detail=True, methods=['post'])
 
     def post(self, request, pk=None):
-        #print("REQ: ", request.headers.authentication)
-        print("REQ: ", request.headers)
-        #data = {'token': request.}
-        #valid_data = VerifyJSONWebTokenSerializer().validate(data)
-        #userID= valid_data['userID']
-        userID = "1"
-        if request.user.userID == userID:
-            print("POSTED")
-            serializer_context = {
-                'request': request,
-            }
+    
+        serializer_context = {
+            'request': request,
+        }
 
-            serializer = PostSerializer(data=request.data, context=serializer_context)
-            print("P",serializer.is_valid())
-            if serializer.is_valid() == True:
-                print("sucessful backend")
+        serializer = PostSerializer(data=request.data, context=serializer_context)
+        print("P",serializer.is_valid())
+        if serializer.is_valid() == True:
+            print("sucessful backend")
+
+            # Compare the userID from request with userID from provided token
+            userIDFromRequest = serializer.validated_data['userID']
+            userIDFromToken = request.user
+
+            if(userIDFromRequest == userIDFromToken):
                 instance = serializer.save()
                 messages.success(request._request, 'Success')
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             else:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                raise ValidationError("Sorry, you are trying to post as another user which is forbidden..")
         
         else:
-            # redirect to some error page
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 # Create your views here.
 class PostViewSet(viewsets.ModelViewSet):
     """

@@ -119,7 +119,6 @@ export default class LinksScreen extends React.Component {
     // should be pretty basic - already have api for POST on new feedPosts
     var USER_TOKEN = await AsyncStorage.getItem(STORAGE_KEY);
     console.log("USERXXX TOKEN: ", USER_TOKEN);
-    
     const uploadApiUrl = api+'/upload/';
     const uri = this.state.image;
     console.log("URI that is used: ", uri);
@@ -166,7 +165,8 @@ export default class LinksScreen extends React.Component {
         // HTTP 301 response
         return response.json();
       }).then((data) => {
-        var urltoPostNewPostTo = api + '/posts/';
+        //var urltoPostNewPostTo = api + '/posts/';
+        var urltoPostNewPostTo = api + '/rest/addPost/';
         
         return fetch(urltoPostNewPostTo, {
           method: 'POST',
@@ -174,7 +174,8 @@ export default class LinksScreen extends React.Component {
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + USER_TOKEN,
+            //'Authorization': 'Bearer ' + USER_TOKEN,
+            'Authorization': 'JWT ' + USER_TOKEN,
           },
 
           body: JSON.stringify({

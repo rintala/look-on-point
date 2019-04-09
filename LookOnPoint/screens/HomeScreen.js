@@ -11,6 +11,7 @@ import {
   Button,
   ImageBackground,
   AsyncStorage,
+  KeyboardAvoidingView,
 } from 'react-native';
 import { WebBrowser } from 'expo';
 
@@ -81,7 +82,8 @@ export default class HomeScreen extends React.Component {
     .then((res) => {
       console.log("reS",res);
       //alert("RES: ",res.toString());
-      if(res.user !== ""){
+
+      if(res.token !== undefined){
         console.log("SUCCESS");
         alert("success");
         
@@ -93,7 +95,7 @@ export default class HomeScreen extends React.Component {
         // Save our token to asyncstorage
         try {
           AsyncStorage.setItem(STORAGE_KEY, userToken);
-          console.log("asyncstorage success");
+          console.log("Asyncstorage success");
         } catch (error) {
           console.log('AsyncStorage error: ' + error.message);
         }
@@ -148,7 +150,7 @@ export default class HomeScreen extends React.Component {
     .then((res) => {
       console.log("reS",res);
       //alert("RES: ",res.toString());
-      if(res.user !== ""){
+      if(res.token !== undefined){
         console.log("SUCCESS");
         alert("success");
         //AsyncStorage.setItem('user', JSON.stringify(res));
@@ -162,6 +164,14 @@ export default class HomeScreen extends React.Component {
 
         console.log("USERID:", theUserID);
 
+        // Save our token to asyncstorage
+        try {
+          AsyncStorage.setItem(STORAGE_KEY, userToken);
+          console.log("Asyncstorage success");
+        } catch (error) {
+          console.log('AsyncStorage error: ' + error.message);
+        }
+
         this.props.navigation.navigate('MainFeed',{
               activeUserID: theUserID,
               activeUsername: this.state.username,
@@ -171,8 +181,11 @@ export default class HomeScreen extends React.Component {
       }
       else{
         console.log("UNSUCCESFUL");
-        alert("RR",res.message);
+        alert("Error: ", res.toString());
       }
+    }).catch((error) => {
+      // handle catch
+      console.log("error:", error);
     })
     .done();
   }
@@ -187,44 +200,54 @@ export default class HomeScreen extends React.Component {
           <ImageBackground
                   style={styles.iconGirlBg} source={require('../assets/images/icon-girl-medium.png')}
                 >
-            <View style={styles.welcomeContainer}>
-              {/*<Image
-                source={
-                  __DEV__
-                    ? require('../assets/images/robot-dev.png')
-                    : require('../assets/images/robot-prod.png')
-                }
-                style={styles.welcomeImage}
-              />*/}
-            </View>
-               
-              <View style={styles.getStartedContainer}>
-                {/*this._maybeRenderDevelopmentModeWarning()*/}
-              
-                <Text style={{color: '#ffe6ff', fontSize: 67, fontFamily:'Romanesco'}}>
-                  LookOnPoint
-                </Text>
-
-                <Text style={styles.appNameSubText}>
-                  Your personal style guide
-                </Text>
-                <TextInput placeholder='Username' onChangeText={ (username) => this.setState({username})}/>
-                <TextInput placeholder='Password' onChangeText={ (password) => this.setState({password})}/>
-                {this.state.confirmSignup == true ?
-                <View>
-                  <TextInput placeholder='Password2' onChangeText={ (password2) => this.setState({password2})}/>
-                </View>
-                :
-                <View/>
-                }
+              {/*
+              <View style={styles.welcomeContainer}>
+                  <Image
+                    source={
+                      __DEV__
+                        ? require('../assets/images/robot-dev.png')
+                        : require('../assets/images/robot-prod.png')
+                    }
+                    style={styles.welcomeImage}
+                  />
+                </View>*/}
+            
+            
+              <KeyboardAvoidingView style={{flex: 1, flexDirection: 'column', justifyContent: 'center',}} behavior="padding" enabled  keyboardVerticalOffset={100}>
+              <ScrollView>
+                  
+                <View style={styles.getStartedContainer}>
+                  {/*this._maybeRenderDevelopmentModeWarning()*/}
                 
-                <View style={{marginTop: 16, marginBottom: 16, width: 100}}>
-                  <Button buttonStyle={styles.loginButton} title=" LOGIN " onPress={this.onPressLogin} color="#400080"/>
-                </View>
-                <View style={{marginTop: 16, width: 100}}>
-                  <Button buttonStyle={styles.signupButton} title="SIGNUP" onPress={this.onPressSignup} color="#6600cc"/>
-                </View>
-              </View>
+                    <Text style={{paddingTop: 250, color: '#ffe6ff', fontSize: 67, fontFamily:'Romanesco'}}>
+                      LookOnPoint
+                    </Text>
+
+                    <Text style={styles.appNameSubText}>
+                      Your personal style guide
+                    </Text>
+                    
+                    <TextInput placeholder='Username' onChangeText={ (username) => this.setState({username})}/>
+                    <TextInput placeholder='Password' onChangeText={ (password) => this.setState({password})}/>
+                    {this.state.confirmSignup == true ?
+                    <View>
+                      <TextInput placeholder='Password2' onChangeText={ (password2) => this.setState({password2})}/>
+                    </View>
+                    :
+                    <View/>
+                    }
+                    
+                    <View style={{marginTop: 16, marginBottom: 16, width: 100}}>
+                      <Button buttonStyle={styles.loginButton} title=" LOGIN " onPress={this.onPressLogin} color="#400080"/>
+                    </View>
+                    <View style={{marginTop: 16, width: 100}}>
+                      <Button buttonStyle={styles.signupButton} title="SIGNUP" onPress={this.onPressSignup} color="#6600cc"/>
+                    </View>
+                  </View>
+                
+                </ScrollView>
+              </KeyboardAvoidingView>
+            
           </ImageBackground>
         </ScrollView>
    
