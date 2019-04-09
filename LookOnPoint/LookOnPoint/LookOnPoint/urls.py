@@ -44,6 +44,7 @@ urlpatterns = [
     path('upload/', views.FileUploadView.as_view()),
     path('addUser/', views.CustomUserView.as_view()),
     path('rest/addPost/', views.SubmitPostView.as_view()),
+    path('rest/addComment/', views.SubmitCommentView.as_view()),
     #url(r'api/', include('api.urls')),
     #path('auth/', include('django.contrib.auth.urls')),
     url(r'^rest-auth/', include('rest_auth.urls')),

@@ -37,6 +37,7 @@ from rest_framework_jwt.serializers import VerifyJSONWebTokenSerializer
 from rest_auth.registration.views import RegisterView
 
 
+###################### USERS #############################
 class CustomRegisterView(RegisterView):
     def create(self, request, *args, **kwargs):
         response = super().create(request, *args, **kwargs)
@@ -117,14 +118,18 @@ class GroupViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows groups to be viewed or edited.
     """
-    
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
 
 
 class SubmitPostView(APIView):
+    """
+    API endpoint that allows user to submit a post.
+
+    AuthComment: OK for only auth person to edit his/her own info.
+    """
+    
     permission_classes = (IsAuthenticated,)
-    #authentication_classes = (TokenAuthentication)
 
     @action(detail=True, methods=['post'])
 
@@ -153,12 +158,14 @@ class SubmitPostView(APIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 # Create your views here.
 class PostViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
     """
     # permission_classes = (IsAuthenticated,)
+    # AuthComment: OK for anyone to see all posts
     permission_classes = (AllowAny,)
 
     queryset = Post.objects.all().order_by('-createdOn')
@@ -172,10 +179,14 @@ class PostViewSet(viewsets.ModelViewSet):
             print("REQ: ", self.request.user)
             return User.objects.filter(id=self.request.user.pk)'''
 
+################### COMMENTS #############################
 class CommentViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
+    
+    - AuthComment: OK for anyone to see all comments
     """
+    
     queryset = Comment.objects.all().order_by('-createdOn')
     serializer_class = CommentSerializer
 
@@ -196,8 +207,44 @@ class CommentViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
 
+class SubmitCommentView(APIView):
+    """
+    API endpoint that allows user to submit comment on post.
+    
+    - AuthComment: OK for auth user to comment on anyones post as himself/herself.
+    """
+    
+    permission_classes=(IsAuthenticated,)
+    
+    @action(detail=True, methods=['post'])
+    def post(self, request, pk=None):
+    
+        serializer_context = {
+            'request': request,
+        }
+
+        serializer = CommentSerializer(data=request.data, context=serializer_context)
+        print("Comment serializer - validity: ",serializer.is_valid())
+        if serializer.is_valid() == True:
+            print("sucessful backend")
+
+            # Compare the userID from request with userID from provided token
+            userIDFromRequest = serializer.validated_data['userID']
+            userIDFromToken = request.user
+
+            if(userIDFromRequest == userIDFromToken):
+                instance = serializer.save()
+                messages.success(request._request, 'Success')
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            else:
+                raise ValidationError("Sorry, you are trying to post as another user which is forbidden..")
+        
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+###################### FILES (POSTS) #############################
 class FileUploadView(APIView):
     parser_class = (FileUploadParser,)
 
