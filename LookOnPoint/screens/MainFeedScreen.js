@@ -13,6 +13,7 @@ import {
   TouchableHighlight,
   TouchableOpacity,
   RefreshControl,
+  AsyncStorage,
 
  } from 'react-native';
 import { ExpoLinksView } from '@expo/samples';
@@ -20,6 +21,8 @@ import { ExpoLinksView } from '@expo/samples';
 const dimensions = Dimensions.get('window');
 const imageWidth = dimensions.width;
 const imageHeight = Math.round(dimensions.width * 16 / 12);
+
+var STORAGE_KEY = 'id_token';
 
 // for api calls from expo app during dev
 import {Constants} from 'expo';
@@ -164,6 +167,8 @@ export default class MainFeedScreen extends React.Component {
       })
   };
 
+  // TODO: fetchComments() function
+
   /* Seems to already be done by default..
   componentWillReceiveProps(nextProps) {
     console.log("WILL RECIEBEP PROPS..");
@@ -175,27 +180,65 @@ export default class MainFeedScreen extends React.Component {
 
   _onRefresh = () => {
     this.setState({refreshing: true});
+
+    // TODO: restrict the fetchPosts to only include the 5 last ones & include showMore button at bottom
     this.fetchPosts().then(() => {
       this.setState({refreshing: false});
     });
+
+    // TODO: add fetchComments here as well - of relevant posts
+  }
+
+  postCommentToBackend = async () => {
+    var USER_TOKEN = await AsyncStorage.getItem(STORAGE_KEY);
+    var urltoPostNewPostTo = api + '/rest/addComment/';
+    console.log("POST INFO TO SEND TO BACKEND: ", this.state.commentToSubmit);
+    console.log("POSTID TO USE: ", api+'/posts/'+this.state.commentToSubmit.postID+'/')
+    console.log("USERID TO USE: ", api+'/users/'+this.state.currentUserID+'/')
+    fetch(urltoPostNewPostTo, {
+          method: 'POST',
+          credentials: "same-origin",
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'JWT ' + USER_TOKEN,
+          },
+
+          body: JSON.stringify({
+            postID: api+'/posts/'+this.state.commentToSubmit.postID+'/',
+            userID: api+'/users/'+this.state.currentUserID+'/',
+            content: this.state.commentToSubmit.content,
+          })
+      }).then((response) => {
+            //this._onRefresh();
+            return response.json();
+            
+      }).catch(function(error){
+            console.log("An error occured while fetching.. ", error);
+      });
+
   }
 
   displayAddNewComment(){
     //alert("Adding new comment - show new component...");
+    
     let showCommentInputNew = true;
     this.setState({
         showCommentInput: showCommentInputNew,
     });
+    
   };
 
   //handleBlur = () =>
-  addCommentToSubmit(event, postID){
+  addCommentToSubmit(event, post){
     console.log("EVENT:. ",event.nativeEvent.text);
     alert("YOUR COMMENT IS ABOUT TO BE RECORDED: ",event.nativeEvent.text);
+    console.log("POST INFORMATION X", post);
     this.setState({
+      // TODO: change id here and fetch from server instead
       commentToSubmit: {
         id: 0,
-        postID: postID,
+        postID: post.postID,
         content: event.nativeEvent.text,
         userName: this.state.currentUserUsername,
         userID: this.state.currentUserID,
@@ -207,7 +250,8 @@ export default class MainFeedScreen extends React.Component {
 
   submitNewComment(){
     //alert("Adding new comment - show new component...");
-
+    
+    // Update state with new comment for instant view update
     let newCommentsArray = this.state.comments;
     newCommentsArray.push(this.state.commentToSubmit);
     console.log("NEWCOMMENTSARRYA: ",newCommentsArray);
@@ -215,7 +259,11 @@ export default class MainFeedScreen extends React.Component {
     this.setState({
       comments: newCommentsArray,
     });
-  
+
+    // POST comment to backend
+    this.postCommentToBackend();
+    
+    // TODO: emit change to socket - instant update for all other users (listeners)
   };
 
   showPostComments(postToSearchFor){
@@ -309,8 +357,6 @@ export default class MainFeedScreen extends React.Component {
           });
         }
       });
-
-      
   };
   
   render() {
@@ -402,7 +448,7 @@ export default class MainFeedScreen extends React.Component {
                              ]
                          }
                           
-                         onSubmitEditing={(event) => this.addCommentToSubmit(event, postInfo.postID)}/>
+                         onSubmitEditing={(event) => this.addCommentToSubmit(event, postInfo)}/>
                         
                          <TouchableOpacity style={styles.submitCommentButton} onPress={() => this.submitNewComment()}>
                           <Text>Comment</Text>
