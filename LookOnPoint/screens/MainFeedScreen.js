@@ -33,23 +33,25 @@ const api = (typeof manifest.packagerOpts === `object`) && manifest.packagerOpts
   : `localhost:8000`;
 
 class CommentContent extends React.Component {
-  
+    
     render() {
+      const comments = this.props.comments;
+      
       return (
   
         <View>
           <Text>{this.props.searchedForPostID}</Text>
-          {this.props.comments.map(commentInfo => {
+          {comments.reverse().map(commentInfo => {
              return commentInfo.postID == this.props.searchedForPostID ?
                 //use approach 3 - proposed by 
                 //source: https://medium.com/@szholdiyarov/conditional-rendering-in-react-native-286351816db4
                 //provide func with params of id
 
-                <Text key={commentInfo.id} style={{textAlign: 'center', fontSize: 27, fontFamily:'Romanesco'}}>
-                   {commentInfo.userName}: "{commentInfo.content}"
+                <Text key={commentInfo.commentID} style={{textAlign: 'center', fontSize: 27, fontFamily:'Romanesco'}}>
+                   {commentInfo.userID}: "{commentInfo.content}"
                 </Text>
                 :
-                <Text key={commentInfo.id}>.....</Text>}
+                <View/>}
             )}
           </View>
       );
@@ -168,6 +170,40 @@ export default class MainFeedScreen extends React.Component {
   };
 
   // TODO: fetchComments() function
+  fetchComments(){
+    console.log("FETCH COMMENTS:..");
+    return fetch(api+'/comments/', {
+        method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+       })
+      .then(response => {
+        if (response.ok) {
+          console.log("RESPONSE OK");
+          return response.json();
+        } else {
+          throw new Error("Encountered problem fetching posts...");
+        }
+      })
+      .then(data => {
+        //if (this.mounted) {
+          var existingPosts = this.state.comments;
+          /*for(i=0;i<data.length;i++){
+            existingPosts.push(data[i]);
+          }*/
+
+          // Set to data directly - will overwrite any prev posts not in DB
+          console.log("Setting new state...");
+          this.setState({
+            comments: data,
+            //isLoading: false,
+          });
+          console.log("NEWSTATE",this.state);
+        //}
+
+      })
+  };
 
   /* Seems to already be done by default..
   componentWillReceiveProps(nextProps) {
@@ -187,6 +223,10 @@ export default class MainFeedScreen extends React.Component {
     });
 
     // TODO: add fetchComments here as well - of relevant posts
+    this.fetchComments().then(() => {
+      this.setState({refreshing: false});
+    });
+    
   }
 
   postCommentToBackend = async () => {
@@ -237,19 +277,17 @@ export default class MainFeedScreen extends React.Component {
     this.setState({
       // TODO: change id here and fetch from server instead
       commentToSubmit: {
-        id: 0,
+        //id: 0,
         postID: post.postID,
         content: event.nativeEvent.text,
         userName: this.state.currentUserUsername,
         userID: this.state.currentUserID,
-
       }
     });
     console.log("STATE: ", this.state)
   };
 
   submitNewComment(){
-    //alert("Adding new comment - show new component...");
     
     // Update state with new comment for instant view update
     let newCommentsArray = this.state.comments;
@@ -258,6 +296,7 @@ export default class MainFeedScreen extends React.Component {
 
     this.setState({
       comments: newCommentsArray,
+      isLoading: false,
     });
 
     // POST comment to backend
@@ -348,7 +387,10 @@ export default class MainFeedScreen extends React.Component {
           console.log("STATE2: ", this.state.posts);
         }
         console.log("NOT MOUNTED.. inside of data :/", this.mounted);
-      })
+      }).then( () => {
+        this.fetchComments().then(() => {
+        this.setState({refreshing: false});
+      })})
       .catch(fetchError => {
         if (this.mounted) {
           this.setState({
@@ -432,7 +474,7 @@ export default class MainFeedScreen extends React.Component {
                   {/* NOT HOW THEY ARE RETRIEVED:.. console.log("POSTINFO ID ", postInfo.postID, " .. ", this.state.posts[postInfo.postID])*/}
                   {postInfo.showComments == true ? 
                     <ScrollView style={styles.container}>
-                      <CommentContent comments={this.state.comments} searchedForPostID={postInfo.postID}/>
+                      <CommentContent comments={this.state.comments} searchedForPostID={api+'/posts/'+postInfo.postID+'/'}/>
                       <Button type="outline" onPress={() => this.displayAddNewComment()}
                         title="Add new comment"/>
                        {this.state.showCommentInput == true ?
@@ -447,7 +489,7 @@ export default class MainFeedScreen extends React.Component {
                              : 'red'}
                              ]
                          }
-                          
+                        
                          onSubmitEditing={(event) => this.addCommentToSubmit(event, postInfo)}/>
                         
                          <TouchableOpacity style={styles.submitCommentButton} onPress={() => this.submitNewComment()}>
