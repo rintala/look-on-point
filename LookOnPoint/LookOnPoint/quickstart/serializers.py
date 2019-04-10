@@ -61,7 +61,7 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
 class PostSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Post
-        fields = ('postID', 'userID', 'imgUrl', 'description', 'numberLikes', 'createdOn', 'showComments')
+        fields = ('postID', 'userID', 'customTitle', 'imgUrl', 'description', 'numberLikes', 'createdOn', 'showComments')
 
 
 class CommentSerializer(serializers.HyperlinkedModelSerializer):

@@ -16,6 +16,10 @@ import {
   AsyncStorage,
 
  } from 'react-native';
+
+// For displaying rating for each post
+import { Rating } from 'react-native-elements';
+
 import { ExpoLinksView } from '@expo/samples';
 
 const dimensions = Dimensions.get('window');
@@ -40,7 +44,7 @@ class CommentContent extends React.Component {
       return (
   
         <View>
-          <Text>{this.props.searchedForPostID}</Text>
+          {/*<Text>{this.props.searchedForPostID}</Text>*/}
           {comments.map(commentInfo => {
              return commentInfo.postID == this.props.searchedForPostID ?
                 //use approach 3 - proposed by 
@@ -48,7 +52,7 @@ class CommentContent extends React.Component {
                 //provide func with params of id
 
                 <Text key={commentInfo.commentID} style={{textAlign: 'center', fontSize: 27, fontFamily:'Romanesco'}}>
-                   {commentInfo.userID}: "{commentInfo.content}"
+                   {commentInfo.userID.split("/")[commentInfo.userID.split("/").length-2]}: "{commentInfo.content}"
                 </Text>
                 :
                 <View/>}
@@ -349,6 +353,10 @@ export default class MainFeedScreen extends React.Component {
 
   hi = "IHI";
 
+  ratingCompleted(rating) {
+    console.log("Rating is: " + rating)
+  }
+
   componentDidMount(){
       let newFetchedPostArray = this.state.posts;
       //let idToFetch = 1;
@@ -464,16 +472,27 @@ export default class MainFeedScreen extends React.Component {
                // styling feed posts differently depending on even/odd id
                <View key={postInfo.postID} style={[(postInfo.postID % 2 == 1) ? styles.oddPost : styles.evenPost]} key={postInfo.id}>
                   <Text style={{textAlign: 'center', fontSize: 47, fontFamily:'Romanesco'}}>
-                    Look {postInfo.imgUrl}
+                    Look {postInfo.customTitle}
                   </Text>
                   
                   <Image source={{uri: postInfo.imgUrl}} 
                   style={{width: imageWidth, height: imageHeight}} />
-                
+                 <View style={{width: imageWidth}}>
+                   <Rating
+                        style={{paddingVertical: 3   }}
+                        showRating
+                        //type="heart"
+                        onFinishRating={this.ratingCompleted}
+                        ratingBackgroundColor = '#fbbff3'
+                        ratingColor='purple'
+                        type='custom'
+                  />
+                </View>
                  <View style={styles.bottomFeedPostBar}>
-                    <Text style={{fontStyle: 'italic', color: 'black'}}>USER: {postInfo.userID}</Text>
+                    
+                    <Text style={{color: 'black', fontFamily: 'Romanesco', fontSize: 24}}>USERID: {postInfo.userID.split("/")[postInfo.userID.split("/").length-2]}</Text>
                     <Text>&nbsp; &nbsp; &nbsp;</Text>
-                    <Text style={{fontStyle: 'italic', color: 'black'}}>CAPTION: {postInfo.description}</Text>
+                    <Text style={{color: 'black', fontFamily: 'Romanesco', fontSize: 24}}>CAPTION: {postInfo.description}</Text>
                   </View>
                   <View style={styles.bottomFeedPostBar}>
                     <Button onPress={() => this.showPostComments(postInfo)}

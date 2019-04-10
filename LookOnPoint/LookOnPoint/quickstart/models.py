@@ -15,7 +15,7 @@ class Post(models.Model):
 	postID = models.AutoField(primary_key=True)
 	userID = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 	#Source: https://stackoverflow.com/questions/34305805/django-foreignkeyuser-in-models
-	
+	customTitle = models.TextField();
 	imgUrl = models.TextField()
 	description = models.TextField()
 	numberLikes = models.PositiveSmallIntegerField(default=0)

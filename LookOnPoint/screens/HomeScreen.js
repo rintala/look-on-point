@@ -18,8 +18,6 @@ import { WebBrowser } from 'expo';
 import { Font } from 'expo';
 import { MonoText, AmaranthText} from '../components/StyledText';
 
-import SQLite from 'react-native-sqlite-2';
-
 // for api calls from expo app during dev
 import {Constants} from 'expo';
 const { manifest } = Constants;
@@ -61,7 +59,7 @@ export default class HomeScreen extends React.Component {
 
   // TODO: fix login function - only check - do not add user if not exists - make backend produce correct resp
   onPressLogin = async () => {
-    alert('Logging you in');
+    // alert('Logging you in');
 
     var urltoPostNewUserTo = api + '/rest-auth/login/';
     await fetch(urltoPostNewUserTo, {
@@ -85,7 +83,7 @@ export default class HomeScreen extends React.Component {
 
       if(res.token !== undefined){
         console.log("SUCCESS");
-        alert("success");
+        // alert("success");
         
         var userToken = res.token;
         var theUserID = res.user.pk;
@@ -109,7 +107,7 @@ export default class HomeScreen extends React.Component {
       }
       else{
         console.log("UNSUCCESFUL");
-        alert("RR",res.message);
+        alert("An eror occurred..",res.message);
       }
     })
     .done();

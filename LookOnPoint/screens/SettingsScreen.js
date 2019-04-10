@@ -72,10 +72,10 @@ export default class SettingsScreen extends React.Component {
     .then((response) => response.json())
     .then((res) => {
       console.log("reS",res);
-      alert("RES: ",res.toString());
+      //alert("RES: ",res.toString());
       if(res.username !== ""){
         console.log("SUCCESS");
-        alert("success");
+        //alert("success");
         console.log("RES EMAIL: ", res.email);
 
         console.log("RES pw: ", res.password);
@@ -86,15 +86,14 @@ export default class SettingsScreen extends React.Component {
       }
       else{
         console.log("UNSUCCESFUL");
-        alert("RR",res.message);
+        alert("Error..",res.message);
       }
     })
     .done();
   }
 
   render() {
-    /* Go ahead and delete ExpoConfigView and replace it with your
-     * content, we just wanted to give you a quick view of your config */
+    
     console.log("PROPS: ", this.props.navigation.state.params);
     	return (
       <View style={styles.container}>
@@ -103,12 +102,47 @@ export default class SettingsScreen extends React.Component {
                 My Profile - {this.props.navigation.state.params.userName} - {this.props.navigation.state.params.userID}
            </Text>
          </View>
-          <Text>
-           	Password info fetched from server: {this.state.userPass}
-          </Text>
-          <Text>
-           	Maybe display PROFILE PIC here as well
-          </Text>
+         <ScrollView style={{flex: 1}}>
+            {/*<Text>
+             	Password info fetched from server: {this.state.userPass}
+            </Text>*/}
+            <View style={{alignItems: 'center'}}>
+              <Text style={{fontSize: 44, fontFamily: 'Romanesco'}}>
+               	{this.props.navigation.state.params.userName}
+              </Text>
+              <Image source={require('../assets/images/icon-anonymous-user.png')} 
+              style={{flex: 1, width: imageWidth/2, height: imageHeight/2}} />
+              
+              {/* Make component out of this "AboutInfo" */}
+              <View>
+                <Text style={{fontSize: 34, fontFamily: 'Romanesco'}}>{"\n"}Fashion summary: </Text>
+                <Text style={{fontSize: 24, fontFamily: 'Romanesco'}}>
+                    FashionStatus: FASHIONGURU
+                </Text>
+                <Text style={{fontSize: 24, fontFamily: 'Romanesco'}}>
+                  FavoriteGenres: #OverSized #Street #Kanye
+                </Text>
+                <Text style={{fontSize: 24, fontFamily: 'Romanesco'}}>
+                  FavoriteColours: #Red #Purple #Pink
+                </Text>
+                <Text style={{fontSize: 34, fontFamily: 'Romanesco'}}> {"\n"}Your fashion in numbers: </Text>
+                
+                <Text style={{fontSize: 24, fontFamily: 'Romanesco'}}>
+                    # of posts:
+                </Text> 
+                <Text style={{fontSize: 54, fontFamily: 'Romanesco'}}>
+                    12 {"\n"}
+                </Text> 
+                <Text style={{fontSize: 24, fontFamily: 'Romanesco'}}>
+                    # of comments:
+                </Text>
+                <Text style={{fontSize: 54, fontFamily: 'Romanesco'}}>
+                    32 {"\n"}
+                </Text> 
+
+              </View>
+            </View>
+          </ScrollView>    
       </View>
     );
   }
@@ -165,6 +199,20 @@ const styles = StyleSheet.create({
     margin: 15,
     height: 40,
   },
+
+  canvas: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    bottom: 0,
+    right: 0,
+  },
+
+  iconGirlBg: {
+      width: '100%',
+      height: '100%',
+      flex: 1,
+    }
 
 
 });

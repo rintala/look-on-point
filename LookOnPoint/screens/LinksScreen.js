@@ -41,6 +41,7 @@ export default class LinksScreen extends React.Component {
     showComments: false,
     numberOfLikes: 0,
     description: '',
+    customTitle: '',
 
   }
   
@@ -85,6 +86,12 @@ export default class LinksScreen extends React.Component {
                 placeholder='Your style caption...'
                 onChangeText={(text) => this.setState({imageCaption: text})}
                 value={this.state.imageCaption}
+              />
+              <TextInput
+                style={{height: 40, borderColor: 'gray', borderWidth: 1}}
+                placeholder='Your custom title...'
+                onChangeText={(text) => this.setState({customTitle: text})}
+                value={this.state.customTitle}
               />
               <Text> IMAGE: {this.state.image}</Text>
               <Button title="UPLOAD" onPress={this.uploadImage}/>
@@ -174,7 +181,6 @@ export default class LinksScreen extends React.Component {
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            //'Authorization': 'Bearer ' + USER_TOKEN,
             'Authorization': 'JWT ' + USER_TOKEN,
           },
 
@@ -183,13 +189,13 @@ export default class LinksScreen extends React.Component {
             imgUrl: this.state.fileNameToRecord ,
             description: this.state.imageCaption,
             showComments: this.state.showComments,
+            customTitle: this.state.customTitle,
           })
       });
       
       }).then((response) => {
-              this.props.navigation.navigate('MainFeed',{
+            this.props.navigation.navigate('MainFeed',{
                   activeUserID: this.state.userID,
-                  
             });
             return response.json();
             
