@@ -96,7 +96,7 @@ export default class MainFeedScreen extends React.Component {
     
      // Client side
      this.socket.on('comment-channel', (newComments) => {
-       console.log("XYZ recived new comments on socket..");
+       console.log("XYZ received new comments on socket..");
        this.setState({ 
         comments: newComments,
         isLoading: false,
@@ -464,22 +464,24 @@ export default class MainFeedScreen extends React.Component {
            </Text>
            
          </View>
-         <Button style={{flex: 1, textAlign: 'center', color: 'white', width: '50%',  fontSize: 37, fontFamily:'Romanesco'}} title="My Profile" onPress={() => 
-            this.props.navigation.navigate('Settings',{
+         <View style={styles.buttonBar}>
+           <Button color="#400080" style={{flex: 1, alignItem: 'center', textAlign: 'center', color: 'white', width: undefined, height: undefined, heightfontSize: 37, fontFamily:'Romanesco'}} title="     My Profile     " onPress={() => 
+              this.props.navigation.navigate('Settings',{
+                userName: this.state.currentUserUsername,
+                userID: this.state.currentUserID,
+                userAuthToken: this.state.currentUserToken,
+                otherParam: 'anything you want here',
+              })
+           }/>
+           <Button color="#6600cc" style={{flex: 1, alignItem: 'center', textAlign: 'center', color: 'purple', width: undefined, height: undefined, fontSize: 37, fontFamily:'Romanesco'}} title="  Add new post (+)  " onPress={() => 
+            this.props.navigation.navigate('Links',{
               userName: this.state.currentUserUsername,
               userID: this.state.currentUserID,
               userAuthToken: this.state.currentUserToken,
               otherParam: 'anything you want here',
             })
-         }/>
-         <Button style={{flex: 1, textAlign: 'center', color: 'purple', width: '50%', fontSize: 37, fontFamily:'Romanesco'}} title="Add new post" onPress={() => 
-          this.props.navigation.navigate('Links',{
-            userName: this.state.currentUserUsername,
-            userID: this.state.currentUserID,
-            userAuthToken: this.state.currentUserToken,
-            otherParam: 'anything you want here',
-          })
-         }/> 
+           }/> 
+         </View>
          
 
       <ScrollView style={styles.container}
@@ -618,6 +620,15 @@ const styles = StyleSheet.create({
     margin: 15,
     height: 40,
   },
+
+  buttonBar: {
+    flexDirection: 'row',
+    backgroundColor: "#400080",
+    alignItems: 'stretch',
+    justifyContent: 'center',
+    width: imageWidth,
+    
+  }
 
 
 });

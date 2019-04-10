@@ -50,7 +50,7 @@ export default class SettingsScreen extends React.Component {
   }
 
   _loadInitialState = async () => { 
-    alert('Loading initial state...');
+    //alert('Loading initial state...');
     
     this.setState({
     	userID: this.props.navigation.state.params.userID,

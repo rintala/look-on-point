@@ -69,7 +69,7 @@ export default class LinksScreen extends React.Component {
 
         <ScrollView>
         <View>
-           <Text> Token: {this.state.userToken} </Text>
+           {/*<Text> Token: {this.state.userToken} </Text>*/}
 
          </View>
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
@@ -114,7 +114,7 @@ export default class LinksScreen extends React.Component {
     
     console.log(result);
 
-    if (!result.cancelled) {
+    if(!result.cancelled) {
       this.setState({ image: result.uri });
     }
   };
