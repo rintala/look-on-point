@@ -49,7 +49,7 @@ urlpatterns = [
     #path('auth/', include('django.contrib.auth.urls')),
     url(r'^rest-auth/', include('rest_auth.urls')),
     url(r'^rest-auth/registration/', include('rest_auth.registration.urls')),
-    url(r'custom/registration/', views.CustomRegisterView.as_view(), name='my_custom_registration'),
+    # url(r'custom/registration/', views.CustomRegisterView.as_view(), name='my_custom_registration'),
     url(r'^refresh-token/', refresh_jwt_token),
 ]
 

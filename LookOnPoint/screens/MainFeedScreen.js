@@ -36,17 +36,26 @@ const api = (typeof manifest.packagerOpts === `object`) && manifest.packagerOpts
   ? 'http://'.concat(manifest.debuggerHost.split(`:`).shift().concat(`:8000`))
   : `localhost:8000`;
 
+const nodeapp = (typeof manifest.packagerOpts === `object`) && manifest.packagerOpts.dev
+  ? 'http://'.concat(manifest.debuggerHost.split(`:`).shift().concat(`:3000`))
+  : `localhost:3000`;
+
+// For real-time comments - will communicate with nodeapp server through sockets
+import SocketIOClient from 'socket.io-client';
+
 class CommentContent extends React.Component {
-    
+
     render() {
       const comments = this.props.comments;
-      
+      console.log("COMMENTS INFO UPDATED??: ",comments);
+      console.log("THIS PROPS SEARCHED FOR POST ID: ", this.props.searchedForPostID);
       return (
   
         <View>
-          {/*<Text>{this.props.searchedForPostID}</Text>*/}
           {comments.map(commentInfo => {
-             return commentInfo.postID == this.props.searchedForPostID ?
+             //console.log("COMMENTINFO POSTID: ",commentInfo.postID.split("/")[commentInfo.postID.split("/").length-2]);
+             //console.log("SERACH FOR POSTID: ",this.props.searchedForPostID.split("/")[this.props.searchedForPostID.split("/").length-2]);
+             return commentInfo.postID.split("/")[commentInfo.postID.split("/").length-2] == this.props.searchedForPostID.split("/")[this.props.searchedForPostID.split("/").length-2] ?
                 //use approach 3 - proposed by 
                 //source: https://medium.com/@szholdiyarov/conditional-rendering-in-react-native-286351816db4
                 //provide func with params of id
@@ -82,13 +91,24 @@ export default class MainFeedScreen extends React.Component {
      // const { params} = this.props.navigation.state;
      // params.refreshingAfterNavigation();
 
+     // Creating the socket-client instance will automatically connect to the server.
+     this.socket = SocketIOClient(nodeapp);
+    
+     // Client side
+     this.socket.on('comment-channel', (newComments) => {
+       console.log("XYZ recived new comments on socket..");
+       this.setState({ 
+        comments: newComments,
+        isLoading: false,
+       });
+     });
+
      this.mounted = true;
 
      this.state = {
         refreshing: refreshing,
         isLoading: true,
         error: null,
-
         postID: 1,
         posts: [],
 
@@ -107,8 +127,9 @@ export default class MainFeedScreen extends React.Component {
         // conclusion: yes, since we can still look up more userID through backend, using postID
         // tradeoff - but worth it as of now
 
-        comments: [
-            {
+        comments: [],
+            
+            /*{
               id: 0,
               postID: 0,
               content: 'Looking so dope.',
@@ -121,8 +142,8 @@ export default class MainFeedScreen extends React.Component {
               content: 'Fire style.',
               userName: 'fashionGuru',
               userID: 12,
-            }
-        ],
+            }*/
+        
         showCommentInput: false,
         isFocused: true,
         commentToSubmit: {
@@ -192,7 +213,7 @@ export default class MainFeedScreen extends React.Component {
       })
       .then(data => {
         //if (this.mounted) {
-          var existingPosts = this.state.comments;
+          var existingComments = this.state.comments;
           /*for(i=0;i<data.length;i++){
             existingPosts.push(data[i]);
           }*/
@@ -200,7 +221,7 @@ export default class MainFeedScreen extends React.Component {
           // Set to data directly - will overwrite any prev posts not in DB
           console.log("Setting new state...");
           this.setState({
-            comments: data,
+            comments: data
             //isLoading: false,
           });
           console.log("NEWSTATE",this.state);
@@ -219,6 +240,7 @@ export default class MainFeedScreen extends React.Component {
   }*/
 
   _onRefresh = () => {
+
     this.setState({refreshing: true});
 
     // TODO: restrict the fetchPosts to only include the 5 last ones & include showMore button at bottom
@@ -274,7 +296,6 @@ export default class MainFeedScreen extends React.Component {
     
   };
 
-  //handleBlur = () =>
   addCommentToSubmit(event, post){
     console.log("EVENT:. ",event.nativeEvent.text);
     alert("YOUR COMMENT IS ABOUT TO BE RECORDED: ",event.nativeEvent.text);
@@ -282,7 +303,6 @@ export default class MainFeedScreen extends React.Component {
     this.setState({
       // TODO: change id here and fetch from server instead
       commentToSubmit: {
-        //id: 0,
         postID: post.postID,
         content: event.nativeEvent.text,
         userName: this.state.currentUserUsername,
@@ -297,6 +317,7 @@ export default class MainFeedScreen extends React.Component {
     // Update state with new comment for instant view update
     let newCommentsArray = this.state.comments;
     
+
     // POST comment to backend
     this.postCommentToBackend().then(data => {
         console.log("commentID: ",data.commentID);
@@ -314,9 +335,12 @@ export default class MainFeedScreen extends React.Component {
           comments: newCommentsArray,
           isLoading: false,
         });
+
+        // TODO: emit change to socket - instant update for all other users (listeners)
+        this.socket.emit('comment-channel', newCommentsArray);
+
     });
     
-    // TODO: emit change to socket - instant update for all other users (listeners)
   };
 
   showPostComments(postToSearchFor){
@@ -328,10 +352,11 @@ export default class MainFeedScreen extends React.Component {
       let newPostArray = this.state.posts;  
       let index = newPostArray.findIndex(post => post.postID == postToSearchFor.postID);
       console.log("INDEXXX: ",index);
-      newPostArray[index].showComments = true;                  
+      newPostArray[index].showComments = !newPostArray[index].showComments;                  
       this.setState({ posts: newPostArray });
 
       console.log("CHANGED showComments to true..", postToSearchFor.postID);
+      console.log("COMMENTS IN STATE:", this.state.comments);
   };
 
   handleFocus = () => this.setState({
@@ -422,6 +447,7 @@ export default class MainFeedScreen extends React.Component {
   render() {
     const { isLoading, comments} = this.state;
     console.log("ISLOADING STATUS.:. ",isLoading);
+
     if (isLoading) {
       return (
         <View style={styles.container}>
@@ -503,7 +529,7 @@ export default class MainFeedScreen extends React.Component {
                   {/* NOT HOW THEY ARE RETRIEVED:.. console.log("POSTINFO ID ", postInfo.postID, " .. ", this.state.posts[postInfo.postID])*/}
                   {postInfo.showComments == true ? 
                     <ScrollView style={styles.container}>
-                      <CommentContent comments={this.state.comments} searchedForPostID={api+'/posts/'+postInfo.postID+'/'}/>
+                      <CommentContent isLoading={isLoading} comments={this.state.comments} searchedForPostID={api+'/posts/'+postInfo.postID+'/'}/>
                       <Button type="outline" onPress={() => this.displayAddNewComment()}
                         title="Add new comment"/>
                        {this.state.showCommentInput == true ?
