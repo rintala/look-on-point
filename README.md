@@ -44,8 +44,6 @@ This project is licensed under the MIT License - see the [LICENSE.md](https://gi
 - **Future:** 
   - Add functionality for comparing two outfits - slide image - rate for favorite through radio buttons.
 
-  - Comments - implement sockets for live updating comments
-
   - Authentication - add logout, destroy JWT token
 
     
