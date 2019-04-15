@@ -7,11 +7,17 @@ Readme template: https://gist.github.com/PurpleBooth/109311bb0361f32d87a2
 
 ### Deployment
 
-Run server:
+Run server 1 - MAIN BACKEND - Django:
 
 ```
 source LookOnPoint/env/bin/activate
 python LookOnPoint/LookOnPoint/manage.py runserver 0.0.0.0:8000
+```
+
+Run server 2 - COMPLEMENTARY FOR SOCKETS - Node:
+
+```
+node nodeapp/app.js
 ```
 
 Run application:
@@ -45,6 +51,10 @@ This project is licensed under the MIT License - see the [LICENSE.md](https://gi
   - Add functionality for comparing two outfits - slide image - rate for favorite through radio buttons.
 
   - Authentication - add logout, destroy JWT token
+
+  - Display username instead of userID by comments & posts:
+
+    - Add endpoint for retrieving list of comments/posts with userName field
 
     
 
