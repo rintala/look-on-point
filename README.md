@@ -34,7 +34,7 @@ npm install
 node app.js
 ```
 
-**Terminal 3: **
+**Terminal 3:**
 
 The mobile application in React Native; requires some node modules to be installed.
 
