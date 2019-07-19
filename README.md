@@ -59,7 +59,7 @@ Or you can just navigate to localhost:8000 while the backend server is running a
 
 ## Authors
 
-- **Jonathan Rintala**
+**Jonathan Rintala**
 
 ## License
 
