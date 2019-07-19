@@ -7,7 +7,7 @@ The main goal of the project is to deliver a mobile React Native app for sharing
 
 The application requires three separate terminals to run:
 
-- the main backend with the REST-API
+- the main backend with the REST API
 - the server for real-time sockets
 - the mobile application
 
