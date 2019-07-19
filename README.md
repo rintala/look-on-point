@@ -44,7 +44,7 @@ npm install
 npm start
 ```
 
-- Then follow Expo instructions for displaying app on either Android/iOS emulator or smartphone.
+Then follow Expo instructions for displaying app on either Android/iOS emulator or smartphone.
 
 ### Additional
 
